@@ -1,5 +1,33 @@
-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
+:root{
+    font-size: 20px;
+    font-family: "century gothic";
+    --bg-color-dark: #000000;
+    --font-color-dark: #ffffff;
+    --bg-color-light: white;
+    --font-color-light: black;
 }
+
+body{
+    color: var(--font-color-dark);
+    background-color: var(--bg-color-dark);
+    margin: 0;
+    padding: 0;
+}
+
+body::-webkit-scrollbar{
+    width: 0.2rem;
+}
+
+body::-webkit-scrollbar-track{
+    background: red;
+}
+
+body::-webkit-scrollbar-thumb{
+    background: blue;
+}
+
+main {
+    margin-left: 3rem;
+    padding: 1rem;
+}
+

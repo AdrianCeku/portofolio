@@ -39,7 +39,7 @@ renderer.render(scene, camera)
 
 // Arcade
 var arcade
-loader.load("models/arcade_game_machine_001/arcade.gltf", function (gltf) {
+loader.load("assets/models/arcade_game_machine_001/arcade.gltf", function (gltf) {
     arcade = gltf.scene
     scene.add(arcade)
     camera.position.x = camera_position_start_x

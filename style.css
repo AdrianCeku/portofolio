@@ -45,7 +45,6 @@ main {
     width: var(--navbar-width-extended);
 }
 
-
 #navbar-list {
     height: 100vh;
     width: var(--navbar-width);
@@ -113,4 +112,12 @@ main {
 
 #navbar:hover #arrow {
     transform: rotate(180deg);
+}
+
+#about {
+    height: 100vh;
+}
+
+#game {
+    height: 100vh;
 }

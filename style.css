@@ -1,4 +1,4 @@
-:root{
+:root {
     font-size: 20px;
     font-family: "century gothic";
     --bg-color-dark: #000000;
@@ -7,27 +7,72 @@
     --font-color-light: black;
 }
 
-body{
+body {
     color: var(--font-color-dark);
     background-color: var(--bg-color-dark);
     margin: 0;
     padding: 0;
 }
 
-body::-webkit-scrollbar{
+body::-webkit-scrollbar{ 
     width: 0.2rem;
 }
 
-body::-webkit-scrollbar-track{
-    background: red;
+body::-webkit-scrollbar-track {
+    background: rgb(40, 0, 40);
 }
 
-body::-webkit-scrollbar-thumb{
-    background: blue;
+body::-webkit-scrollbar-thumb {
+    background: rgb(70, 0, 70);
 }
 
 main {
     margin-left: 3rem;
     padding: 1rem;
+    border: dotted red;
 }
 
+#navbar {
+    top: 0;
+    left: 0;
+    width: 3rem;
+    height: 100vh;
+    position: fixed;
+    background-color: var(--bg-color-dark);
+    border: dotted blue;
+}
+
+#navbar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    border: dotted green;
+}
+
+.navbar-item {
+    width: 100%;
+    color: grey;
+    margin-bottom: 1rem;
+}
+
+.navbar-item:nth-child(4) {
+    margin-top: auto;
+}
+
+.navbar-link {
+    display: flex;
+    align-items: center;
+    width: 3rem;
+    text-decoration: none;
+}
+
+.navbar-link svg {
+    width: 2rem;
+}
+.navbar-text {
+    display: none;
+}

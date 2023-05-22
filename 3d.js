@@ -29,7 +29,7 @@ camera.position.y = camera_position_start_y
 camera.position.z = camera_position_start_z
 
 const renderer = new THREE.WebGLRenderer({
-  canvas: document.querySelector('#bg'),
+  canvas: document.querySelector('#arcade'),
 })
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -121,9 +121,6 @@ function get_inbetween(start, end, progress){
 }
 function camera_movement() {
   var progress = current_scroll_progress()
-  if(played_game ==  false){
-    window.scrollTo(0,0)
-  }
   if(played_game == true){
     floating = true
     camera.position.x = get_inbetween(camera_position_end_x, camera_position_start_x, progress)

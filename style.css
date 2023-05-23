@@ -60,7 +60,7 @@ main {
     width: 2rem;
     height: 2rem;
     margin: 0.5rem;
-    filter: brightness(35%);
+    filter: brightness(60%);
     display: flex;
     transition: margin-left 0.2s ease-in, filter 0.5s;
 }
@@ -75,7 +75,7 @@ main {
 
 .navbar-item:hover {
     margin-left: 0.7rem;
-    filter: brightness(80%);
+    filter: brightness(90%);
 }
 
 .navbar-link {

@@ -93,7 +93,7 @@ main {
 }
 
 .navbar-text {
-    color: var(--font-color-main);
+    color: #ffffff;
     margin-left: -1rem;
     display: block;
     text-decoration: none;

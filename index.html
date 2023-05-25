@@ -71,7 +71,8 @@
             </svg>
             <span class="navbar-text"> Credits </span>
         <li class="navbar-item">
-          <a class="navbar-link" href="Darkmode">
+          <a class="navbar-link" onclick="switchMode()">
+            <script type="module" src="/main.js"></script> 
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
               viewBox="0 0 512 512">
@@ -82,6 +83,26 @@
             </svg>
             <span class="navbar-text"> Light / Darkmode </span>
           </a>
+          <script>
+            let darkmode = true
+            function switchMode() {
+                root = document.querySelector(":root")
+                if(darkmode==true) {
+                    darkmode = false
+                    root.style.setProperty("--bg-color-main", "#ffffff")
+                    root.style.setProperty(" --bg-color-secondary", "#b8b8b8")
+                    root.style.setProperty("--font-color-main", "#090000")
+                    root.style.setProperty("--font-color-secondary", "#656565")
+                }
+                else {
+                    darkmode= true
+                    root.style.setProperty("--bg-color-main", "#0a000c")
+                    root.style.setProperty(" --bg-color-secondary", "#090a10")
+                    root.style.setProperty("--font-color-main", "#ffffff")
+                    root.style.setProperty("--font-color-secondary", "#484848")
+                }
+            }
+          </script>
         </li>
       </ul>
     </nav>

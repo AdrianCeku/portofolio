@@ -58,8 +58,7 @@ function update_size() {
 }
 window.onresize = update_size
 
-let old_rotation
-let old_position
+/*  Old 3d code
 
 function animation() {
     requestAnimationFrame(animation)
@@ -67,3 +66,30 @@ function animation() {
     renderer.render(scene, camera)
 }
 
+function get_inbetween(start, end, progress){
+    return (end * progress) + (start * (1-progress))
+}
+
+function current_scroll_progress()
+{
+    return ((document.documentElement.scrollTop + document.body.scrollTop) / (document.documentElement.scrollHeight - document.documentElement.clientHeight));
+}
+
+function keydown(key){
+    if(key["key"] == "e" && played_game == false){
+      floating = false
+      last_pos_y = arcade.position.y
+      last_pos_z = arcade.position.z
+      last_rotation_x = arcade.rotation.x 
+      last_rotation_z = arcade.rotation.z
+      arcade.position.y = get_inbetween(last_pos_y, 0, i)
+      arcade.position.z = get_inbetween(last_pos_z, 0, i)
+      arcade.rotation.x = get_inbetween(last_rotation_x, 0, i)
+      arcade.rotation.z = get_inbetween(last_rotation_z, 0, i)
+      played_game = true
+    }
+}
+
+document.body.onscroll = camera_movement
+
+*/

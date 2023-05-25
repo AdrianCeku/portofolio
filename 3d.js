@@ -67,3 +67,13 @@ function animation() {
     renderer.render(scene, camera)
 }
 
+// returns an inbetween value, between end and start value given the progress as a float between 0 and 1
+
+function get_inbetween(start, end, progress){
+    return (end * progress) + (start * (1-progress))
+}
+
+function keydown(key){
+}
+
+document.body.onkeydown = keydown

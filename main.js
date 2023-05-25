@@ -19,6 +19,11 @@ const obeserver = new IntersectionObserver((elements) => {
 const hidden_elements = document.querySelectorAll(".hidden")
 hidden_elements.forEach((el) => obeserver.observe(el))
 
+// returns current scroll progress as a float between 0 and 1
+function current_scroll_progress()
+{
+    return ((document.documentElement.scrollTop + document.body.scrollTop) / (document.documentElement.scrollHeight - document.documentElement.clientHeight));
+}
 
 /*
 let darkmode = true

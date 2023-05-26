@@ -1,14 +1,22 @@
 import "/style.css"
 
 var canvas = document.querySelector("#game")
-var ctx = canvas.getContext("2d");
-ctx.fillStyle = "#FF0000";
-ctx.fillRect(0, 0, 75, 75);
+var ctx = canvas.getContext("2d")
+ctx.fillStyle = "#FFFFFF"
+ctx.fillRect(50 , 0, 130, 150)
+
+let controls = []
 
 function keydown(key){
-    if(key["key"]=="e") {
-        console.log("e pressed")
+    if(key["key"]==" ") {
+        key.preventDefault();
     }
+    controls.add(key["key"])
+}
+
+function animate() {
+    requestAnimationFrame(animate)
+    console.log(controls)
 }
 
 document.body.onkeydown = keydown

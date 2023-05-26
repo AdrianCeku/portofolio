@@ -7,7 +7,7 @@
     --font-color-main: #ffffff;
     --font-color-secondary: #484848;
     --inverse-border-color: #ffffff;
-    --accent-color: #ffffff;
+    --accent-color: #7110ae;
     --navbar-width: 4rem;
     --navbar-width-extended: 10rem;
 }
@@ -34,7 +34,7 @@ body {
 }
 
 body::-webkit-scrollbar{ 
-    width: 0.2rem;
+    width: 0.25rem;
 }
 
 body::-webkit-scrollbar-track {
@@ -42,7 +42,7 @@ body::-webkit-scrollbar-track {
 }
 
 body::-webkit-scrollbar-thumb {
-    background: rgb(70, 0, 70);
+    background: var(--accent-color);
 }
 
 main {
@@ -81,15 +81,6 @@ main {
     filter: brightness(60%);
     display: flex;
     transition: margin-left 0.2s ease-in, filter 0.5s;
-    color: var(--accent-color);
-}
-
-.navbar-item:first-child {
-    filter: brightness(80%);
-}
-
-#navbar:hover .navbar-item:first-child {
-    filter: brightness(100%);
 }
 
 .navbar-item:nth-child(7) {
@@ -102,9 +93,9 @@ main {
 }
 
 #arrow {
-    filter: saturate(40%);
+    color: var(--accent-color);
     transform: none;
-    transition: transform 0.25s ease-in;
+    transition: all 0.25s ease-in;
 }
 
 #navbar:hover #arrow {
@@ -151,10 +142,20 @@ main {
 }
 
 #about {
+    display: grid;
+    top: 0;
     height: 100vh;
     width: 100%;
     border: red dotted;
     overflow: hidden;
+}
+
+#about h1 {
+    margin: auto;
+}
+
+#about h1 span {
+    color: var(--accent-color);
 }
 
 #arcade {

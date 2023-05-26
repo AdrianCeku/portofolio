@@ -16,49 +16,44 @@ const obeserver = new IntersectionObserver((elements) => {
     })
 })
 
+
 const description = document.querySelector("#description")
 
-const descriptions = ["developer.","gamer.","student.","hardware enthusiast."]
+const descriptions = ["developer.","gamer.","student."]
 
 function startDescriptionsAnim(){
-    let fill = false
-    let word
+    let deleting = true
     let i = 0
     let i2 = 0
-    window.setInterval(function() {
-        if(description.innerHTML.length == 0 && fill==true) {
-            i = 0
-            description.innerHTML = word[i]
-            i++
-        }
-        else if(description.innerHTML.length != 0 && fill==true) {
-            description.innerHTML += word[i]
-            if(i==word.length-1) {
-                fill=false
-                i=0
+    console.log("Test startAnim")
+    const interval = window.setInterval(function() {
+        if(description.innerHTML.length == 0 && deleting == true) {
+            if(i == descriptions.length) {
+                i = 0
             }
-            else {
+            deleting = false
+        }
+        else if(description.innerHTML.length >= 0 && deleting == false) {
+            if(description.innerHTML.length == descriptions[i].length) {
                 i++
-            }
-        }
-        else if(description.innerHTML.length == 0 && fill==false){
-            if(i2==descriptions.length-1){
+                deleting = true
                 i2 = 0
-                word = descriptions[0]
             }
-            else {
-                word = descriptions[i2]
-                i2 ++
+            else {description.innerHTML += descriptions[i][i2]
+            i2 ++
             }
-            fill = true
-            
         }
-        else if(description.innerHTML.length != 0 && fill==false) {
+        else if(description.innerHTML.length > 0 && deleting == true) {
             description.innerHTML = description.innerHTML.slice(0,-1)
+            console.log("deletion...")
         }
-    }, 300)
+        console.log(deleting)
+    }, 250)
 }
 
+function stopDescriptionsAnim() {
+    clearInterval(interval)
+}
 const hidden_elements = document.querySelectorAll(".hidden")
 hidden_elements.forEach((el) => obeserver.observe(el))
 

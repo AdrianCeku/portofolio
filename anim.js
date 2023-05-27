@@ -19,14 +19,13 @@ const obeserver = new IntersectionObserver((elements) => {
 
 const description = document.querySelector("#description")
 
-const descriptions = ["developer.","gamer.","student."]
+const descriptions = ["developer.","gamer.","student.","sussy baka."]
 
 function startDescriptionsAnim(){
     let deleting = true
     let i = 0
     let i2 = 0
-    console.log("Test startAnim")
-    const interval = window.setInterval(function() {
+    window.setInterval(function() {
         if(description.innerHTML.length == 0 && deleting == true) {
             if(i == descriptions.length) {
                 i = 0
@@ -47,13 +46,9 @@ function startDescriptionsAnim(){
             description.innerHTML = description.innerHTML.slice(0,-1)
             console.log("deletion...")
         }
-        console.log(deleting)
-    }, 250)
+    }, 150)
 }
 
-function stopDescriptionsAnim() {
-    clearInterval(interval)
-}
 const hidden_elements = document.querySelectorAll(".hidden")
 hidden_elements.forEach((el) => obeserver.observe(el))
 

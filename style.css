@@ -116,7 +116,7 @@ main {
     filter: saturate(40%);
     min-width: 2rem;
     min-height: 2rem;
-    transition: filter 0.5s ease-in;
+    transition: filter 0.25s ease-in;
 }
 
 .navbar-item:hover .navbar-link svg {
@@ -128,7 +128,7 @@ main {
 }
 
 .navbar-text {
-    color: var(--font-color-main);
+    color: #ffffff;
     margin-left: -1rem;
     display: block;
     text-decoration: none;
@@ -146,7 +146,6 @@ main {
     top: 0;
     height: 100vh;
     width: 100%;
-    border: red dotted;
     overflow: hidden;
 }
 

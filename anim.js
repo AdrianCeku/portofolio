@@ -21,11 +21,12 @@ const description = document.querySelector("#description")
 
 const descriptions = ["developer.","gamer.","student.","sussy baka."]
 
-function startDescriptionsAnim(){
+function startAnim(){
     let deleting = true
     let i = 0
     let i2 = 0
     window.setInterval(function() {
+        //if deletion is done
         if(description.innerHTML.length == 0 && deleting == true) {
             if(i == descriptions.length) {
                 i = 0
@@ -63,4 +64,4 @@ function getInbetween(start, end, progress){
     return (end * progress) + (start * (1-progress))
 }
 
-startDescriptionsAnim()
+startAnim()

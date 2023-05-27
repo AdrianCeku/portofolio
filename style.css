@@ -35,10 +35,11 @@ body {
 
 body::-webkit-scrollbar{ 
     width: 0.25rem;
+    height: 0.25rem;
 }
 
 body::-webkit-scrollbar-track {
-    background: rgb(40, 0, 40);
+    background: var(--bg-color-main);
 }
 
 body::-webkit-scrollbar-thumb {
@@ -47,7 +48,6 @@ body::-webkit-scrollbar-thumb {
 
 main {
     margin-left: var(--navbar-width);
-    padding: 1rem;
 }
 
 #navbar {
@@ -143,7 +143,6 @@ main {
 
 #about {
     display: grid;
-    top: 0;
     height: 100vh;
     width: 100%;
     overflow: hidden;
@@ -157,16 +156,45 @@ main {
     color: var(--accent-color);
 }
 
+#layered-peaks {
+    color: var(--accent-color);
+}
+
+#layer-1 {
+    filter: brightness(100%) saturate(20%); 
+}
+#layer-2 {
+    filter: brightness(80%) saturate(40%); 
+}
+#layer-3 {
+    filter: brightness(60%) saturate(60%); 
+}
+#layer-4 {
+    filter: brightness(40%) saturate(80%); 
+}
+#layer-5 {
+    filter: brightness(20%) saturate(100%); 
+}
+
+#arcade-div {
+    height: 150vh;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+#arcade-div h1 {
+    margin: 0;
+}
+
 #arcade {
     height: 100vh;
     width: 100%;
-    border: red dotted;
 }
 
 #qr-code {
     height: 100vh; 
     width: 100%;
-    border: red dotted;
 }
 
 #qr-code img {
@@ -182,17 +210,14 @@ main {
 #discord-bot {
     height: 100vh; 
     width: 100%;
-    border: red dotted;
 }
 
 #python {
     height: 100vh; 
     width: 100%;
-    border: red dotted;
 }
 
 #credits {
     height: 100vh; 
     width: 100%;
-    border: red dotted;
 }

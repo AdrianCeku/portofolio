@@ -1,5 +1,5 @@
 :root {
-    font-size: 20px;
+    font-size: 19px;
     font-family: "century gothic";
     scroll-behavior: smooth;
     --bg-color-main: #0a000c;
@@ -149,7 +149,10 @@ main {
 }
 
 #about h1 {
-    margin: auto;
+    margin: 0;
+    justify-self: center;
+    height: 50vh;
+    transform: translateY(50%);
 }
 
 #about h1 span {
@@ -157,6 +160,8 @@ main {
 }
 
 #layered-peaks {
+    transform: scaleX(200%);
+    height: 50vh;
     color: var(--accent-color);
 }
 

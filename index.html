@@ -114,29 +114,29 @@
       </ul>
     </nav>
     <main>
-      <div id="about" class="hidden">
-        <h1> 
+      <div id="about">
+        <h1 class="hidden"> 
           <p>Hi! My name is <span> Adrian.</span></p>
           <p>Im a <span id="description"></span></p>
         </h1>
+        <svg 
+          id="layered-peaks" 
+          viewBox="0 720 2560 720" 
+          xmlns="http://www.w3.org/2000/svg" 
+          xmlns:xlink="http://www.w3.org/1999/xlink" 
+          version="1.1">
+          <path id="layer-1" fill="currentColor" d="M0 980L366 1005L731 1043L1097 922L1463 1031L1829 1019L2194 866L2560 955L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
+          <path id="layer-2" fill="currentColor" d="M0 994L366 1053L731 1121L1097 1082L1463 997L1829 1014L2194 966L2560 1062L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
+          <path id="layer-3" fill="currentColor" d="M0 1104L366 1152L731 1122L1097 1183L1463 1080L1829 1071L2194 1144L2560 1188L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
+          <path id="layer-4" fill="currentColor" d="M0 1184L366 1283L731 1196L1097 1273L1463 1268L1829 1268L2194 1248L2560 1264L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
+          <path id="layer-5" fill="currentColor" d="M0 1277L366 1330L731 1355L1097 1318L1463 1366L1829 1353L2194 1334L2560 1309L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
+        </svg>
       </div>
-      <svg 
-        id="layered-peaks" 
-        viewBox="0 720 2560 720" 
-        xmlns="http://www.w3.org/2000/svg" 
-        xmlns:xlink="http://www.w3.org/1999/xlink" 
-        version="1.1">
-        <path id="layer-1" fill="currentColor" d="M0 980L366 1005L731 1043L1097 922L1463 1031L1829 1019L2194 866L2560 955L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
-        <path id="layer-2" fill="currentColor" d="M0 994L366 1053L731 1121L1097 1082L1463 997L1829 1014L2194 966L2560 1062L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
-        <path id="layer-3" fill="currentColor" d="M0 1104L366 1152L731 1122L1097 1183L1463 1080L1829 1071L2194 1144L2560 1188L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
-        <path id="layer-4" fill="currentColor" d="M0 1184L366 1283L731 1196L1097 1273L1463 1268L1829 1268L2194 1248L2560 1264L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
-        <path id="layer-5" fill="currentColor" d="M0 1277L366 1330L731 1355L1097 1318L1463 1366L1829 1353L2194 1334L2560 1309L2560 1441L2194 1441L1829 1441L1463 1441L1097 1441L731 1441L366 1441L0 1441Z"></path>
-      </svg>
-      <div id="arcade-div" class="hidden">
+      <div id="arcade-div">
         <canvas id="arcade">
-          <canvas id="game"></canvas>
-          <script defer type="module" src="/game.js"></script>
         </canvas>
+        <canvas id="game"></canvas>
+        <script defer type="module" src="/game.js"></script>
         <script defer type="module" src="/3d.js"></script>
         <h1> Arcade Machine</h1>
       </div>

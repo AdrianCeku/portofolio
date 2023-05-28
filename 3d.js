@@ -29,10 +29,10 @@ const ambientLight = new THREE.AmbientLight(0xffffff)
 scene.add(ambientLight)
 
 //Skydome
-const skydomeTexture = new THREE.TextureLoader().load("assets/img/space.jpg")
+const skydomeTexture = new THREE.TextureLoader().load("assets/img/space_dev.jpg")
 skydomeTexture.wrapS = THREE.RepeatWrapping;
 skydomeTexture.wrapT = THREE.RepeatWrapping;
-skydomeTexture.repeat.set( 10, 10 );
+skydomeTexture.repeat.set( 10, 11 );
 const skydomeMaterial = new THREE.MeshBasicMaterial({ map: skydomeTexture })
 skydomeMaterial.side = THREE.DoubleSide
 const skydomeGeometry = new THREE.SphereGeometry(10000,32,32)

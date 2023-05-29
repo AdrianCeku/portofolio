@@ -28,6 +28,8 @@ function clock() {
     canvas.width = 1300 * 1
     canvas.height = 1700 * 1
     const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "red"
+    ctx.fillRect(0,300,1300,1300)
     ctx.save();
     ctx.clearRect(0, 0, 150, 150);
     ctx.translate(75, 75);

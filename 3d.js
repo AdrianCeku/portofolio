@@ -3,6 +3,11 @@ import "/style.css"
 import * as THREE from "three"
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 import { degToRad } from "three/src/math/MathUtils"
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
+
+
 
 
 //Setup
@@ -12,21 +17,34 @@ const backgroundTexture = new THREE.Color("white")//new THREE.TextureLoader().lo
 scene.background = backgroundTexture
 
 const camera = new THREE.PerspectiveCamera(45, document.querySelector("#arcade").clientWidth / window.innerHeight, 0.1, 11000)
-camera.position.set(250, 400, 0)
+camera.position.set(350, 400, 0)
 
-const renderer = new THREE.WebGLRenderer({canvas: document.querySelector('#arcade')})
+const renderer = new THREE.WebGLRenderer({canvas: document.querySelector('#arcade'), antialias: true})
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(document.querySelector("#about").clientWidth, window.innerHeight)
-renderer.render(scene, camera)
+
+const composer = new EffectComposer(renderer)
+const renderPass = new RenderPass(scene, camera)
+const bloomPass = new UnrealBloomPass()
+composer.addPass(renderPass)
+composer.addPass(bloomPass)
+
 
 const arcadeGroup = new THREE.Group()
 const cameraGroup = new THREE.Group()
 cameraGroup.add(camera)
 
 // Lighting
-const ambientLight = new THREE.AmbientLight(0xffffff)
+const pointLight = new THREE.PointLight(0xffffff)
+pointLight.position.set(350, 400, 0)
+pointLight.intensity = 0.3
+scene.add(pointLight)
+const pointLightHelper = new THREE.PointLightHelper(pointLight,10)
+//scene.add(pointLightHelper)
 
-scene.add(ambientLight)
+const ambientLight = new THREE.AmbientLight(0xffffff)
+ambientLight.intensity = 0.005
+//scene.add(ambientLight)
 
 //Skydome
 const skydomeTexture = new THREE.TextureLoader().load("assets/img/space_dev.jpg")
@@ -44,12 +62,22 @@ scene.add(cameraGroup)
 const screenTexture = new THREE.CanvasTexture(document.querySelector("#game"))
 screenTexture.needsUpdate = true
 const screenGeometry = new THREE.PlaneGeometry(170, 130)
-const screenMaterial = new THREE.MeshBasicMaterial({ map: screenTexture })
+const screenMaterial = new THREE.MeshBasicMaterial({ map: screenTexture, emissive: screenTexture})
 screenMaterial.needsUpdate = true
 const screen = new THREE.Mesh(screenGeometry, screenMaterial)
 screen.position.set(20, 398, 0)
 screen.rotation.set(degToRad(90), degToRad(108), degToRad(-90))
 arcadeGroup.add(screen)
+
+/*
+//Screen emissive
+const screenEmissiveMaterial = new THREE.MeshStandardMaterial({ map: screenTexture, emissive: "red"})
+screenEmissiveMaterial.needsUpdate = true
+const screenEmissive = new THREE.Mesh(screenGeometry, screenEmissiveMaterial)
+screenEmissive.position.set(20, 398, 0)
+screenEmissive.rotation.set(degToRad(90), degToRad(108), degToRad(-90))
+arcadeGroup.add(screenEmissive)
+*/
 
 // Arcade
 let arcade
@@ -80,5 +108,5 @@ function animation() {
     cameraGroup.position.y += 0.1
     cameraGroup.position.z += 0.1
     camera.lookAt(screen.position)
-    renderer.render(scene, camera)
+    composer.render()
 }

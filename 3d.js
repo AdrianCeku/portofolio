@@ -62,7 +62,7 @@ scene.add(cameraGroup)
 const screenTexture = new THREE.CanvasTexture(document.querySelector("#game"))
 screenTexture.needsUpdate = true
 const screenGeometry = new THREE.PlaneGeometry(170, 130)
-const screenMaterial = new THREE.MeshBasicMaterial({ map: screenTexture, emissive: screenTexture})
+const screenMaterial = new THREE.MeshStandardMaterial({ map: screenTexture, emissive: screenTexture})
 screenMaterial.needsUpdate = true
 const screen = new THREE.Mesh(screenGeometry, screenMaterial)
 screen.position.set(20, 398, 0)

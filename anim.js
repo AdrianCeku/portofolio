@@ -24,8 +24,8 @@ const descriptions = ["developer.","gamer.","student.","sussy baka."]
 function startAnim(){
     let delay = 150 //in ms
     let deleting = true
-    let i = 0
-    let i2 = 0
+    let i = 0 //word index  
+    let i2 = 0 //char index
     window.setInterval(function() {
         //if word is deleted, but still in deletion mode, switch to adding mode and go to next word
         if(description.innerHTML.length == 0 && deleting == true) {
@@ -38,18 +38,18 @@ function startAnim(){
         }
         // add next char if not deleting
         else if(deleting == false) {
-            //If word is fully printed, start deleting
+            //If word is fully printed, start deleting instead and reset char index 
             if(description.innerHTML.length == descriptions[i].length) {
                 deleting = true
                 i2 = 0
             }
-            // add next char
+            // add next char and increment char index
             else {
                 description.innerHTML += descriptions[i][i2]
                 i2 ++
             }
         }
-        //remove last char if deleting
+        //remove last char if deleting 
         else if(deleting == true) {
             description.innerHTML = description.innerHTML.slice(0,-1)
         }

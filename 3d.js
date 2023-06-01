@@ -10,16 +10,13 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 
 //Setup
 const loader = new GLTFLoader()
+
 const scene = new THREE.Scene()
 const backgroundTexture = new THREE.Color("black")//new THREE.TextureLoader().load("assets/img/space.jpg")
 scene.background = backgroundTexture
 
-
 const camera = new THREE.PerspectiveCamera(45, document.querySelector("#arcade").clientWidth / window.innerHeight, 0.1, 11000)
 camera.position.set(350, 400, 0)
-
-
-
 
 const renderer = new THREE.WebGLRenderer({canvas: document.querySelector('#arcade'), antialias: true})
 renderer.setPixelRatio(window.devicePixelRatio)
@@ -30,7 +27,6 @@ const renderPass = new RenderPass(scene, camera)
 const bloomPass = new UnrealBloomPass()
 composer.addPass(renderPass)
 composer.addPass(bloomPass)
-
 
 const arcadeGroup = new THREE.Group()
 const cameraGroup = new THREE.Group()
@@ -63,9 +59,11 @@ scene.add(cameraGroup)
 // Screen
 const screenTexture = new THREE.CanvasTexture(document.querySelector("#game"))
 screenTexture.needsUpdate = true
+
 const screenGeometry = new THREE.PlaneGeometry(170, 130)
 const screenMaterial = new THREE.MeshStandardMaterial({ map: screenTexture, emissive: screenTexture})
 screenMaterial.needsUpdate = true
+
 const screen = new THREE.Mesh(screenGeometry, screenMaterial)
 screen.position.set(20, 398, 0)
 screen.rotation.set(degToRad(90), degToRad(108), degToRad(-90))
@@ -102,26 +100,21 @@ function updateSize() {
 }
 window.onresize = updateSize
 
+// animation
 function animation() {
     requestAnimationFrame(animation)
     screenTexture.needsUpdate = true
     screenMaterial.needsUpdate = true
-    /*
-    cameraGroup.position.x += 0.1
-    cameraGroup.position.y += 0.1
-    cameraGroup.position.z += 0.1
-    */
     camera.lookAt(screen.position)
     composer.render()
 }
 
 // spin controls
-
 let spinning = false
 let mouseX
 let rotationSpeed
 
-
+/*
 document.querySelector("#arcade").addEventListener("pointerdown", function (event) {
     spinning = true
     mouseX = event.clientX
@@ -134,11 +127,10 @@ document.querySelector("#arcade").addEventListener("pointermove", function (even
         arcadeGroup.rotation.y += rotationSpeed
         mouseX = event.clientX
     }
-    console.log(rotationSpeed)
 })
 
 document.querySelector("#arcade").addEventListener("pointerup", function (event) {
-    let fade = 0.0003
+    let fade = 0.0005
     let cutoff = fade + 0.0005
     spinning = false
     let interval = window.setInterval(function() {
@@ -152,3 +144,4 @@ document.querySelector("#arcade").addEventListener("pointerup", function (event)
     
         }, 10)
 })
+*/

@@ -12,7 +12,7 @@ function keydown(key){
     if(key["key"]==" ") {
         key.preventDefault();
     }
-    controls.add(key["key"])
+    controls.push(key["key"])
 }
 
 function animate() {

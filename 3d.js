@@ -7,19 +7,21 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
+import {darkmode} from "./main.js"
 
 
 //Setup
 const loader = new GLTFLoader()
 
 const scene = new THREE.Scene()
-const backgroundTexture = new THREE.Color("black")//new THREE.TextureLoader().load("assets/img/space.jpg")
-scene.background = backgroundTexture
+const backgroundTextureDark = new THREE.TextureLoader().load("assets/img/space_dark.jpg")
+const backgroundTextureLight = new THREE.TextureLoader().load("assets/img/space_light.jpg")
+scene.background = backgroundTextureDark
 
 const arcadeGroup = new THREE.Group()
 const cameraGroup = new THREE.Group()
 
-const camera = new THREE.PerspectiveCamera(45, document.querySelector("#arcade").clientWidth / window.innerHeight, 0.1, 11000)
+const camera = new THREE.PerspectiveCamera(45, document.querySelector("#arcade").clientWidth / window.innerHeight, 0.1, 20000)
 camera.position.set(350, 400, 0)
 cameraGroup.add(camera)
 
@@ -41,23 +43,26 @@ const pointLight = new THREE.PointLight(0xffffff)
 pointLight.position.set(350, 400, 0)
 pointLight.intensity = 0.3
 scene.add(pointLight)
-const pointLightHelper = new THREE.PointLightHelper(pointLight,10)
-//scene.add(pointLightHelper)
 
 const ambientLight = new THREE.AmbientLight(0xffffff)
-ambientLight.intensity = 0.005
-//scene.add(ambientLight)
+ambientLight.intensity = 0.1
+scene.add(ambientLight)
 
 
 //Skydome
-const skydomeTexture = new THREE.TextureLoader().load("assets/img/space_dev.jpg")
-skydomeTexture.wrapS = THREE.RepeatWrapping
-skydomeTexture.wrapT = THREE.RepeatWrapping
-skydomeTexture.repeat.set( 10, 11 )
+const skydomeTextureDark = new THREE.TextureLoader().load("assets/img/space_dark.jpg")
+skydomeTextureDark.wrapS = THREE.RepeatWrapping
+skydomeTextureDark.wrapT = THREE.RepeatWrapping
+skydomeTextureDark.repeat.set(10, 11)
+
+const skydomeTextureLight = new THREE.TextureLoader().load("assets/img/space_light.jpg")
+skydomeTextureLight.wrapS = THREE.RepeatWrapping
+skydomeTextureLight.wrapT = THREE.RepeatWrapping
+skydomeTextureLight.repeat.set(5, 5)
 
 const skydomeGeometry = new THREE.SphereGeometry(10000,32,32)
 
-const skydomeMaterial = new THREE.MeshBasicMaterial({ map: skydomeTexture })
+const skydomeMaterial = new THREE.MeshBasicMaterial({ map: skydomeTextureDark })
 skydomeMaterial.side = THREE.DoubleSide
 
 const skydome = new THREE.Mesh(skydomeGeometry, skydomeMaterial)
@@ -65,6 +70,23 @@ const skydome = new THREE.Mesh(skydomeGeometry, skydomeMaterial)
 cameraGroup.add(skydome)
 scene.add(cameraGroup)
 
+function updateSkydome() {
+    if(darkmode == true) {
+        scene.background = backgroundTextureDark
+        skydome.material.map = skydomeTextureDark
+        ambientLight.color.set(0xffffff)
+        ambientLight.intensity = 0.1
+        
+    }
+    else {
+        scene.background = backgroundTextureLight
+        skydome.material.map = skydomeTextureLight
+        ambientLight.color.set(0xffa500)
+        ambientLight.intensity = 0.5
+    }
+}
+
+export {updateSkydome}
 
 // Screen
 const screenTexture = new THREE.CanvasTexture(document.querySelector("#game"))
@@ -116,7 +138,7 @@ function updateSize() {
 window.onresize = updateSize
 
 const orbControls = new OrbitControls(camera, renderer.domElement)
-orbControls.enabled = false
+orbControls.enabled = true
 
 
 // animation
@@ -147,6 +169,7 @@ document.querySelector("#arcade").addEventListener("pointermove", function (even
         rotationSpeed = (event.clientX - mouseX) / 1000 
         arcadeGroup.rotation.y += rotationSpeed
         mouseX = event.clientX
+        console.log(darkmode)
     }
 })
 

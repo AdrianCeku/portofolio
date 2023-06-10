@@ -174,7 +174,7 @@ document.querySelector("#arcade").addEventListener("pointermove", function (even
 })
 
 document.querySelector("#arcade").addEventListener("pointerup", function (event) {
-    let fade = 0.0007
+    let fade = 0.0004
     let cutoff = fade + 0.0005
     spinning = false
     let interval = window.setInterval(function() {

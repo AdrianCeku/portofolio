@@ -32,7 +32,7 @@ class Player {
 }
 
 class Enemy {
-
+  
 }
 
 class Projectile {

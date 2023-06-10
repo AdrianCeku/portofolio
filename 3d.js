@@ -138,7 +138,7 @@ function updateSize() {
 window.onresize = updateSize
 
 const orbControls = new OrbitControls(camera, renderer.domElement)
-orbControls.enabled = true
+orbControls.enabled = false
 
 
 // animation

@@ -1,133 +1,73 @@
 import "/style.css"
 
+const canvas = document.querySelector("#game")
+const ctx = canvas.getContext("2d")
 
-/*
-var canvas = document.querySelector("#game")
-var ctx = canvas.getContext("2d")
-*/
+const size = 10
+canvas.width = 170 * size
+canvas.height = 130 * size
 
-let controls = []
-
-function keydown(key){
-    if(key["key"]==" ") {
-        key.preventDefault();
-    }
-    controls.push(key["key"])
+class inputHandler {
+  
 }
 
-function animate() {
-    requestAnimationFrame(animate)
-    console.log(controls)
-}
-
-document.body.onkeydown = keydown
-
-function clock() {
-    const now = new Date();
-    const canvas = document.getElementById("game");
-    canvas.width = 1300 * 1
-    canvas.height = 1700 * 1
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "red"
-    ctx.fillRect(0,300,1300,1300)
-    ctx.save();
-    ctx.clearRect(0, 0, 150, 150);
-    ctx.translate(75, 75);
-    ctx.scale(0.4, 0.4);
-    ctx.rotate(-Math.PI / 2);
-    ctx.strokeStyle = "black";
-    ctx.fillStyle = "white";
-    ctx.lineWidth = 8;
-    ctx.lineCap = "round";
-  
-    // Hour marks
-    ctx.save();
-    for (let i = 0; i < 12; i++) {
-      ctx.beginPath();
-      ctx.rotate(Math.PI / 6);
-      ctx.moveTo(100, 0);
-      ctx.lineTo(120, 0);
-      ctx.stroke();
-    }
-    ctx.restore();
-  
-    // Minute marks
-    ctx.save();
-    ctx.lineWidth = 5;
-    for (let i = 0; i < 60; i++) {
-      if (i % 5 !== 0) {
-        ctx.beginPath();
-        ctx.moveTo(117, 0);
-        ctx.lineTo(120, 0);
-        ctx.stroke();
-      }
-      ctx.rotate(Math.PI / 30);
-    }
-    ctx.restore();
-  
-    const sec = now.getSeconds();
-    const min = now.getMinutes();
-    const hr = now.getHours() % 12;
-  
-    ctx.fillStyle = "black";
-  
-    // Write image description
-    canvas.innerText = `The time is: ${hr}:${min}`;
-  
-    // Write Hours
-    ctx.save();
-    ctx.rotate(
-      (Math.PI / 6) * hr + (Math.PI / 360) * min + (Math.PI / 21600) * sec
-    );
-    ctx.lineWidth = 14;
-    ctx.beginPath();
-    ctx.moveTo(-20, 0);
-    ctx.lineTo(80, 0);
-    ctx.stroke();
-    ctx.restore();
-  
-    // Write Minutes
-    ctx.save();
-    ctx.rotate((Math.PI / 30) * min + (Math.PI / 1800) * sec);
-    ctx.lineWidth = 10;
-    ctx.beginPath();
-    ctx.moveTo(-28, 0);
-    ctx.lineTo(112, 0);
-    ctx.stroke();
-    ctx.restore();
-  
-    // Write seconds
-    ctx.save();
-    ctx.rotate((sec * Math.PI) / 30);
-    ctx.strokeStyle = "#D40000";
-    ctx.fillStyle = "#D40000";
-    ctx.lineWidth = 6;
-    ctx.beginPath();
-    ctx.moveTo(-30, 0);
-    ctx.lineTo(83, 0);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, 0, 10, 0, Math.PI * 2, true);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(95, 0, 10, 0, Math.PI * 2, true);
-    ctx.stroke();
-    ctx.fillStyle = "rgba(0, 0, 0, 0)";
-    ctx.arc(0, 0, 3, 0, Math.PI * 2, true);
-    ctx.fill();
-    ctx.restore();
-  
-    ctx.beginPath();
-    ctx.lineWidth = 14;
-    ctx.strokeStyle = "#325FA2";
-    ctx.arc(0, 0, 142, 0, Math.PI * 2, true);
-    ctx.stroke();
-  
-    ctx.restore();
-  
-    window.requestAnimationFrame(clock);
+class Player {
+  constructor(game) {
+    this.game = game
+    this.width = 120
+    this.height = 190
+    this.x = 0
+    this.y = 0
+    this.speedX = 0
+    this.speedY = 0
   }
-  
-  window.requestAnimationFrame(clock);
+  update() {
+    this.y += this.speedY
+    this.x += this.speedX
+  }
+  draw(ctx) {
+    ctx.fillStyle = "red"
+    ctx.fillRect(this.x, this.y, this.width, this.height)
+  }
+}
 
-clock()
+class Enemy {
+
+}
+
+class Projectile {
+
+}
+
+class Particle {
+
+}
+
+class layer {
+
+}
+
+class background {
+
+}
+
+class powerup {
+
+}
+class Game {
+  constructor(width, height) {
+    this.width = width
+    this.height = height
+    this.player = new Player(this)
+  }
+  update() {
+    this.player.update()
+  }
+  draw(ctx) {
+    this.player.draw(ctx)
+  }
+}
+
+const game = new Game(canvas.width, canvas.height)
+
+game.draw(ctx)

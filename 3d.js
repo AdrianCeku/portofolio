@@ -6,7 +6,7 @@ import { degToRad } from "three/src/math/MathUtils"
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
+import { OrbitControls } from "three/addons/controls/OrbitControls.js"
 import {darkmode} from "./main.js"
 
 
@@ -138,7 +138,7 @@ function updateSize() {
 window.onresize = updateSize
 
 const orbControls = new OrbitControls(camera, renderer.domElement)
-orbControls.enabled = false
+orbControls.enabled = true
 
 
 // animation

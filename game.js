@@ -3,12 +3,30 @@ import "/style.css"
 const canvas = document.querySelector("#game")
 const ctx = canvas.getContext("2d")
 
-const size = 10
-canvas.width = 170 * size
-canvas.height = 130 * size
+const resolutionScale = 10
+canvas.width = 170 * resolutionScale
+canvas.height = 130 * resolutionScale
 
-class inputHandler {
-  
+window.addEventListener("load", function () {
+class InputHandler {
+  constructor(game) {
+    this.game = game
+    this.acceptedInputs = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "e", "E"]
+    window.addEventListener("keydown", event => {
+      if ((this.acceptedInputs.includes(event.key)) &&  !(this.game.inputs.includes(event.key))) {
+        this.game.inputs.push(event.key)
+      }
+      console.log(this.game.inputs)
+      event.preventDefault()
+    })
+    window.addEventListener("keyup", event => {
+      if (this.game.inputs.includes(event.key)) {
+        this.game.inputs.splice(this.game.inputs.indexOf(event.key), 1)
+      }
+      console.log(this.game.inputs)
+      }
+    )
+  }
 }
 
 class Player {
@@ -20,10 +38,27 @@ class Player {
     this.y = 0
     this.speedX = 0
     this.speedY = 0
+    this.speedMultiplier = 10
   }
   update() {
+    this.speedX = 0
+    this.speedY = 0
+    if (this.game.inputs.includes("ArrowUp")) {
+      this.speedY -= 1 * this.speedMultiplier
+    }
+    if (this.game.inputs.includes("ArrowDown")) {
+      this.speedY += 1 * this.speedMultiplier
+    }
+    if (this.game.inputs.includes("ArrowLeft")) {
+      this.speedX -= 1 * this.speedMultiplier
+    }
+    if (this.game.inputs.includes("ArrowRight")) {
+      this.speedX += 1 * this.speedMultiplier
+    }
+
     this.y += this.speedY
     this.x += this.speedX
+    console.log(this.x, this.y)
   }
   draw(ctx) {
     ctx.fillStyle = "red"
@@ -43,15 +78,15 @@ class Particle {
 
 }
 
-class layer {
+class Layer {
 
 }
 
-class background {
+class Background {
 
 }
 
-class powerup {
+class Powerup {
 
 }
 class Game {
@@ -59,6 +94,8 @@ class Game {
     this.width = width
     this.height = height
     this.player = new Player(this)
+    this.inputhandler = new InputHandler(this)
+    this.inputs = []
   }
   update() {
     this.player.update()
@@ -71,3 +108,15 @@ class Game {
 const game = new Game(canvas.width, canvas.height)
 
 game.draw(ctx)
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  game.update()
+  game.draw(ctx)
+  requestAnimationFrame(animate)
+}
+
+animate()
+
+//closing brackets for "load" event listener
+})

@@ -138,16 +138,16 @@ function updateSize() {
 window.onresize = updateSize
 
 const orbControls = new OrbitControls(camera, renderer.domElement)
-orbControls.enabled = true
+orbControls.enabled = false
 
 
 // animation
 function animation() {
-    requestAnimationFrame(animation)
     screenTexture.needsUpdate = true
     screenMaterial.needsUpdate = true
     camera.lookAt(screen.position)
     composer.render()
+    requestAnimationFrame(animation)
 }
 
 

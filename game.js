@@ -13,20 +13,20 @@ window.addEventListener("load", function () {
 class InputHandler {
   constructor(game) {
     this.game = game
-    this.acceptedInputs = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "e", "E"]
+    this.acceptedInputs = ["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "e"]
 
     window.addEventListener("keydown", event => {
-      if ((this.acceptedInputs.includes(event.key)) && !(this.game.inputs.includes(event.key))) {
-        this.game.inputs.push(event.key)
-        console.log(this.game.inputs)
+      if ((this.acceptedInputs.includes(event.key.toLowerCase())) && !(this.game.currentInputs.includes(event.key.toLowerCase()))) {
+        this.game.currentInputs.push(event.key.toLowerCase())
+        console.log(this.game.currentInputs)
       }
       event.preventDefault()
     })
 
     window.addEventListener("keyup", event => {
-      if (this.game.inputs.includes(event.key)) {
-        this.game.inputs.splice(this.game.inputs.indexOf(event.key), 1)
-        console.log(this.game.inputs)
+      if (this.game.currentInputs.includes(event.key.toLowerCase())) {
+        this.game.currentInputs.splice(this.game.currentInputs.indexOf(event.key.toLowerCase()), 1)
+        console.log(this.game.currentInputs)
       }
       }
     )
@@ -43,48 +43,50 @@ class Player {
     this.padding = 50
     this.speedX = 0
     this.speedY = 0
-    this.speedMultiplier = 10
+    this.speedMultiplier = 1
     this.attackspeed = 50
-    this.timeSinceLastShot = 0
-    this.minTimeBetweenShots = 1000
+    this.shotTimer = 0
+    this.shotInterval = 100 // in ms
     this.maxAmmo = 25
     this.currentAmmo = 20
-    this.ammoReplenishRate = 0.01
-    this.shotSpeed = 20
+    this.ammoTimer = 0
+    this.ammoInterval = 750 // in ms
+    this.shotSpeed = 3
     this.projectileWidth = 100
     this.projectileHeight = 30
     this.damage = 10
     this.health = 100
   }
 
-  update() {
+  update(deltaTime) {
     this.speedX = 0
     this.speedY = 0
-    if (this.game.inputs.includes("ArrowUp") && this.y > 0) {
+    if (this.game.currentInputs.includes("arrowup") && this.y > 0) {
       this.speedY -= 1 * this.speedMultiplier
     }
-    if (this.game.inputs.includes("ArrowDown") && this.y < canvas.height - (this.height + this.padding)) {
+    if (this.game.currentInputs.includes("arrowdown") && this.y < canvas.height - (this.height + this.padding)) {
       this.speedY += 1 * this.speedMultiplier
     }
-  
-    if (this.game.inputs.includes("ArrowLeft") && this.x > 50) {
+    if (this.game.currentInputs.includes("arrowleft") && this.x > 50) {
       this.speedX -= 1 * this.speedMultiplier
     }
-    if (this.game.inputs.includes("ArrowRight") && this.x < canvas.width - (this.width + this.padding )) {
+    if (this.game.currentInputs.includes("arrowright") && this.x < canvas.width - (this.width + this.padding )) {
       this.speedX += 1 * this.speedMultiplier
     }
     
-    this.y += this.speedY
-    this.x += this.speedX
+    this.y += this.speedY * deltaTime
+    this.x += this.speedX * deltaTime
 
-    if (this.game.inputs.includes(" ")) {
+    if (this.game.currentInputs.includes(" ")) {
       this.game.player.shoot()
     }
 
-    if(this.currentAmmo < this.maxAmmo) this.currentAmmo += this.ammoReplenishRate
-    if(this.timeSinceLastShot < this.minTimeBetweenShots) this.timeSinceLastShot += this.attackspeed
-    //console.log(this.currentAmmo)
-    //console.log(this.timeSinceLastShot)
+    if(this.currentAmmo < this.maxAmmo && this.ammoTimer < this.ammoInterval) this.ammoTimer += deltaTime
+    if(this.ammoTimer >= this.ammoInterval) {
+      this.currentAmmo ++
+      this.ammoTimer = 0
+    }
+    if(this.shotTimer < this.shotInterval) this.shotTimer += deltaTime 
   }
 
   draw(ctx) {
@@ -93,10 +95,10 @@ class Player {
   }
 
   shoot() {
-    if (this.currentAmmo > 1 && this.timeSinceLastShot >= 1000) {
+    if (this.currentAmmo > 1 && this.shotTimer >= this.shotInterval) {
       this.currentAmmo --
       this.game.playerProjectiles.push(new Projectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage))
-      this.timeSinceLastShot = 0
+      this.shotTimer = 0
     }
   }
 }
@@ -119,8 +121,8 @@ class Projectile {
     this.markedForDeletion = false
   }
 
-  update() {
-    this.x += this.speed
+  update(deltaTime) {
+    this.x += this.speed * deltaTime
     if (this.x < 0 || this.x > 1700 ) this.markedForDeletion = true
     console.log(this.game.playerProjectiles)
   }
@@ -171,15 +173,15 @@ class Game {
     this.inputhandler = new InputHandler(this)
     this.player = new Player(this)
     this.ui = new UI(this)
-    this.inputs = []
+    this.currentInputs = []
     this.playerProjectiles = []
     this.enemyProjectiles = []
     this.score = 0
   }
-  update() {
-    this.player.update()
+  update(deltaTime) {
+    this.player.update(deltaTime)
     this.playerProjectiles.forEach(projectile => {
-      projectile.update()
+      projectile.update(deltaTime)
       if (projectile.markedForDeletion) {
         this.playerProjectiles.splice(this.playerProjectiles.indexOf(projectile), 1)
       }
@@ -196,14 +198,17 @@ class Game {
 
 const game = new Game(canvas.width, canvas.height)
 
-function animate() {
+let lastTime = 0
+function animate(timeStamp) {
+  const deltaTime = timeStamp - lastTime
+  lastTime = timeStamp
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-  game.update()
+  game.update(deltaTime)
   game.draw(ctx)
   requestAnimationFrame(animate)
 }
 
-animate()
+animate(0)
 
 //closing brackets for "load" event listener
 })

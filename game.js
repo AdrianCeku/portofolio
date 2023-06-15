@@ -9,6 +9,17 @@ canvas.height = 1300
 var dashhorizon = new FontFace("dashhorizon", "url(assets/fonts/dashhorizon.otf)")
 document.fonts.add(dashhorizon)
 
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min) ) + min;
+}
+
+function chance(percent) {
+  if (Math.random() <= percent) {
+    return true
+  }
+  else return false
+}
+
 window.addEventListener("load", function () {
 class InputHandler {
   constructor(game) {
@@ -18,7 +29,6 @@ class InputHandler {
     window.addEventListener("keydown", event => {
       if ((this.acceptedInputs.includes(event.key.toLowerCase())) && !(this.game.currentInputs.includes(event.key.toLowerCase()))) {
         this.game.currentInputs.push(event.key.toLowerCase())
-        console.log(this.game.currentInputs)
       }
       event.preventDefault()
     })
@@ -26,7 +36,6 @@ class InputHandler {
     window.addEventListener("keyup", event => {
       if (this.game.currentInputs.includes(event.key.toLowerCase())) {
         this.game.currentInputs.splice(this.game.currentInputs.indexOf(event.key.toLowerCase()), 1)
-        console.log(this.game.currentInputs)
       }
       }
     )
@@ -44,7 +53,6 @@ class Player {
     this.speedX = 0
     this.speedY = 0
     this.speedMultiplier = 1
-    this.attackspeed = 50
     this.shotTimer = 0
     this.shotInterval = 100 // in ms
     this.maxAmmo = 25
@@ -81,6 +89,7 @@ class Player {
       this.game.player.shoot()
     }
 
+    console.log(this.x + " " + this.y)
     if(this.currentAmmo < this.maxAmmo && this.ammoTimer < this.ammoInterval) this.ammoTimer += deltaTime
     if(this.ammoTimer >= this.ammoInterval) {
       this.currentAmmo ++
@@ -90,7 +99,7 @@ class Player {
   }
 
   draw(ctx) {
-    ctx.fillStyle = "red"
+    ctx.fillStyle = "blue"
     ctx.fillRect(this.x, this.y, this.width, this.height)
   }
 
@@ -104,9 +113,46 @@ class Player {
 }
 
 class Enemy {
-  constructor(game) {
+  constructor(game, shooting) {
+    this.game = game
+    this.height = 190
+    this.width = 120
+    this.x = 1700
+    this.y = randomInt(canvas.height - this.height, 0)
+    this.speedX = -1
+    this.speedMultiplier = Math.random() * 2 + 0.1
+    this.shooting = shooting
+    this.shotTimer = 0
+    this.shotInterval = randomInt(1000,250) // in ms
+    this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
+    this.projectileWidth = 100
+    this.projectileHeight = 30
+    this.damage = randomInt(30,15)
+    this.health = randomInt(200,50)
+    this.markedForDeletion = false
+
   }
   
+  update(deltaTime) {
+    this.x += this.speedX * this.speedMultiplier * deltaTime
+    if (this.x + this.width < 0) this.markedForDeletion = true
+    this.shotTimer += deltaTime
+    if (this.shotTimer >= this.shotInterval) {
+      this.shoot()
+      this.shotTimer = 0
+    }
+  }
+
+  draw(ctx) {
+    ctx.fillStyle = "red"
+    ctx.fillRect(this.x, this.y, this.width, this.height)
+  }
+  
+  shoot() {
+    if(this.shooting) {
+      this.game.enemyProjectiles.push(new Projectile(this.game, this.x - this.projectileWidth - 0.1, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage))
+    }
+  }
 }
 
 class Projectile {
@@ -123,11 +169,11 @@ class Projectile {
 
   update(deltaTime) {
     this.x += this.speed * deltaTime
-    if (this.x < 0 || this.x > 1700 ) this.markedForDeletion = true
+    if (this.x + this.width < 0 || this.x - this.width > 1700 ) this.markedForDeletion = true
   }
 
   draw(ctx) {
-    ctx.fillStyle = "blue"
+    ctx.fillStyle = "yellow"
     ctx.fillRect(this.x, this.y, this.width, this.height)
   }
 }
@@ -151,46 +197,95 @@ class Powerup {
 class UI {
   constructor(game) {
     this.game = game
-  }
-
-  update() {
-
+    this.fontSize = 100
+    this.fontFamily = "dashhorizon"
+    this.color = "white"
   }
 
   draw(ctx) {
-    ctx.fillStyle = "white"
-    ctx.font = "100px dashhorizon"
+    ctx.fillStyle = this.color
+    ctx.font = this.fontSize + "px " + this.fontFamily
     ctx.fillText("Health: " + Math.ceil(game.player.health), 50, 100)
     ctx.fillText("Ammo: " + game.player.currentAmmo, 50, 200)
-    ctx.fillText("Score: " + game.score, 1150, 100)
+    ctx.fillText("Time: " + Math.round(game.gameTime/1000) + "s", 1150, 100)
+    ctx.fillText("Score: " + game.score, 1150, 200)
   }
 }
 class Game {
   constructor(width, height) {
     this.width = width
     this.height = height
+    this.gameTime = 0 // in ms
+    this.score = 0
     this.inputhandler = new InputHandler(this)
     this.player = new Player(this)
     this.ui = new UI(this)
     this.currentInputs = []
     this.playerProjectiles = []
+    this.enemySpawnTimer = 0
+    this.enemySpawnInterval = 2000 // startvalue, only in ms if spawnAcceleration is 1
+    this.spawnAcceleration = 1
+    this.spawnAccelerationTimer = 0
+    this.spawnAccelerationInterval = 20000 // in ms
+    this.enemies = []
     this.enemyProjectiles = []
-    this.score = 0
   }
   update(deltaTime) {
+    this.gameTime += deltaTime
     this.player.update(deltaTime)
+
+    this.spawnAccelerationTimer += deltaTime
+    if (this.spawnAccelerationTimer >= this.spawnAccelerationInterval) {
+      this.spawnAcceleration *= 1.1
+      this.spawnAccelerationTimer = 0
+      console.log(this.spawnAcceleration)
+    }
+
+    //player projectiles 
     this.playerProjectiles.forEach(projectile => {
       projectile.update(deltaTime)
       if (projectile.markedForDeletion) {
         this.playerProjectiles.splice(this.playerProjectiles.indexOf(projectile), 1)
       }
     })
+
+    //enemies
+    this.enemySpawnTimer += deltaTime * this.spawnAcceleration
+    if (this.enemySpawnTimer >= this.enemySpawnInterval) {
+      this.enemies.push(new Enemy(this, chance(0.3)))
+      this.enemySpawnTimer = 0
+    }
+    this.enemies.forEach(enemy => {
+      enemy.update(deltaTime)
+      if (enemy.markedForDeletion) {
+        this.enemies.splice(this.enemies.indexOf(enemy), 1)
+      }
+    })
+
+    //enemy projectiles
+    this.enemyProjectiles.forEach(projectile => {
+      projectile.update(deltaTime)
+      if (projectile.markedForDeletion) {
+        this.enemyProjectiles.splice(this.enemyProjectiles.indexOf(projectile), 1)
+      }
+    })
   }
+
   draw(ctx) {
     this.player.draw(ctx)
+
     this.playerProjectiles.forEach(projectile => {
       projectile.draw(ctx)
     })
+
+    this.enemies.forEach(enemy => {
+      enemy.draw(ctx)
+    })
+
+    this.enemyProjectiles.forEach(projectile => {
+      projectile.draw(ctx)
+    })
+
     this.ui.draw(ctx)
   }
 }

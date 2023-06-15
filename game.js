@@ -6,6 +6,9 @@ const ctx = canvas.getContext("2d")
 canvas.width = 1700
 canvas.height = 1300
 
+var dashhorizon = new FontFace("dashhorizon", "url(assets/fonts/dashhorizon.otf)")
+document.fonts.add(dashhorizon)
+
 window.addEventListener("load", function () {
 class InputHandler {
   constructor(game) {
@@ -42,10 +45,16 @@ class Player {
     this.speedY = 0
     this.speedMultiplier = 10
     this.attackspeed = 50
-    this.timeSinceLastShot = 1000
-    this.maxAmmo = 20
-    this.ammo = 20
+    this.timeSinceLastShot = 0
+    this.minTimeBetweenShots = 1000
+    this.maxAmmo = 25
+    this.currentAmmo = 20
     this.ammoReplenishRate = 0.01
+    this.shotSpeed = 20
+    this.projectileWidth = 100
+    this.projectileHeight = 30
+    this.damage = 10
+    this.health = 100
   }
 
   update() {
@@ -72,10 +81,10 @@ class Player {
       this.game.player.shoot()
     }
 
-    if(this.ammo < this.maxAmmo) this.ammo += this.ammoReplenishRate
-    if(this.timeSinceLastShot < 1000) this.timeSinceLastShot += this.attackspeed
-    console.log(this.ammo)
-    console.log(this.timeSinceLastShot)
+    if(this.currentAmmo < this.maxAmmo) this.currentAmmo += this.ammoReplenishRate
+    if(this.timeSinceLastShot < this.minTimeBetweenShots) this.timeSinceLastShot += this.attackspeed
+    //console.log(this.currentAmmo)
+    //console.log(this.timeSinceLastShot)
   }
 
   draw(ctx) {
@@ -84,15 +93,17 @@ class Player {
   }
 
   shoot() {
-    if (this.ammo > 1 && this.timeSinceLastShot >= 1000) {
-      this.ammo -= 1
-      this.game.playerProjectiles.push(new Projectile(this.game, this.x + this.width, this.y + this.height / 2, 100, 30, 10, 10))
+    if (this.currentAmmo > 1 && this.timeSinceLastShot >= 1000) {
+      this.currentAmmo --
+      this.game.playerProjectiles.push(new Projectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage))
       this.timeSinceLastShot = 0
     }
   }
 }
 
 class Enemy {
+  constructor(game) {
+  }
   
 }
 
@@ -135,21 +146,41 @@ class Background {
 class Powerup {
 
 }
+
+class UI {
+  constructor(game) {
+    this.game = game
+  }
+
+  update() {
+
+  }
+
+  draw(ctx) {
+    ctx.fillStyle = "white"
+    ctx.font = "100px dashhorizon"
+    ctx.fillText("Health: " + Math.ceil(game.player.health), 50, 100)
+    ctx.fillText("Ammo: " + Math.floor(game.player.currentAmmo), 50, 200)
+    ctx.fillText("Score: " + game.score, 1150, 100)
+  }
+}
 class Game {
   constructor(width, height) {
     this.width = width
     this.height = height
-    this.player = new Player(this)
     this.inputhandler = new InputHandler(this)
+    this.player = new Player(this)
+    this.ui = new UI(this)
     this.inputs = []
     this.playerProjectiles = []
     this.enemyProjectiles = []
+    this.score = 0
   }
   update() {
     this.player.update()
     this.playerProjectiles.forEach(projectile => {
       projectile.update()
-      if (projectile.markedForDeletion == true) {
+      if (projectile.markedForDeletion) {
         this.playerProjectiles.splice(this.playerProjectiles.indexOf(projectile), 1)
       }
     })
@@ -159,12 +190,11 @@ class Game {
     this.playerProjectiles.forEach(projectile => {
       projectile.draw(ctx)
     })
+    this.ui.draw(ctx)
   }
 }
 
 const game = new Game(canvas.width, canvas.height)
-
-game.draw(ctx)
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height)

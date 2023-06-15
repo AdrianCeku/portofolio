@@ -95,7 +95,7 @@ class Player {
   }
 
   shoot() {
-    if (this.currentAmmo > 1 && this.shotTimer >= this.shotInterval) {
+    if (this.currentAmmo > 0 && this.shotTimer >= this.shotInterval) {
       this.currentAmmo --
       this.game.playerProjectiles.push(new Projectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage))
       this.shotTimer = 0
@@ -124,7 +124,6 @@ class Projectile {
   update(deltaTime) {
     this.x += this.speed * deltaTime
     if (this.x < 0 || this.x > 1700 ) this.markedForDeletion = true
-    console.log(this.game.playerProjectiles)
   }
 
   draw(ctx) {
@@ -162,7 +161,7 @@ class UI {
     ctx.fillStyle = "white"
     ctx.font = "100px dashhorizon"
     ctx.fillText("Health: " + Math.ceil(game.player.health), 50, 100)
-    ctx.fillText("Ammo: " + Math.floor(game.player.currentAmmo), 50, 200)
+    ctx.fillText("Ammo: " + game.player.currentAmmo, 50, 200)
     ctx.fillText("Score: " + game.score, 1150, 100)
   }
 }

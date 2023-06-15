@@ -160,8 +160,6 @@ let rotationSpeed = 0
 document.querySelector("#arcade").addEventListener("pointerdown", function (event) {
     spinning = true
     mouseX = event.clientX
-    console.log(arcadeGroup)
-
 })
 
 document.querySelector("#arcade").addEventListener("pointermove", function (event) {
@@ -169,7 +167,6 @@ document.querySelector("#arcade").addEventListener("pointermove", function (even
         rotationSpeed = (event.clientX - mouseX) / 1000 
         arcadeGroup.rotation.y += rotationSpeed
         mouseX = event.clientX
-        console.log(darkmode)
     }
 })
 
@@ -186,7 +183,5 @@ document.querySelector("#arcade").addEventListener("pointerup", function (event)
         if(rotationSpeed > 0) rotationSpeed -= fade
         if(rotationSpeed < 0) rotationSpeed += fade
         arcadeGroup.rotation.y += rotationSpeed
-    
         }, 10)
-        console.log(arcadeGroup)
 })

@@ -10,7 +10,7 @@
     --accent-color: #7110ae;
     --navbar-width: 4rem;
     --navbar-width-extended: 10rem;
-    --about-scroll-progress: 0;
+    --scroll-progress: 0;
 }
 
 .hidden {
@@ -170,32 +170,32 @@ main {
     color: var(--accent-color);
     transform: scaleX(200%);
     animation: fade-to-black 1s linear infinite;
-    animation-delay: calc(var(--about-scroll-progress) * -0.5s);
+    animation-delay: calc(var(--scroll-progress) * 5 * -0.5s);
     animation-play-state: paused;
 }
 
 #layer-1 {
     filter: brightness(100%) saturate(20%);
     animation: peak-slide 1s linear infinite;
-    animation-delay: calc(var(--about-scroll-progress) * -0.4s);
+    animation-delay: calc(var(--scroll-progress ) * 5 * -0.4s);
     animation-play-state: paused;
 }
 #layer-2 {
     filter: brightness(80%) saturate(40%); 
     animation: peak-slide 1s linear infinite;
-    animation-delay: calc(var(--about-scroll-progress) * -0.30s);
+    animation-delay: calc(var(--scroll-progress) * 5 * -0.30s);
     animation-play-state: paused;
 }
 #layer-3 {
     filter: brightness(60%) saturate(60%); 
     animation: peak-slide 1s linear infinite;
-    animation-delay: calc(var(--about-scroll-progress) * -0.2s);
+    animation-delay: calc(var(--scroll-progress) * 5 * -0.2s);
     animation-play-state: paused;
 }
 #layer-4 {
     filter: brightness(40%) saturate(80%); 
     animation: peak-slide 1s linear infinite;
-    animation-delay: calc(var(--about-scroll-progress) * -0.1s);
+    animation-delay: calc(var(--scroll-progress) * 5 * -0.1s);
     animation-play-state: paused;
 }
 #layer-5 {

@@ -4,25 +4,13 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js"
 
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 
-const obeserver = new IntersectionObserver((elements) => {
-    elements.forEach((element) => {
-        console.log(element)
-        if (element.isIntersecting) {
-            element.target.classList.add("shown")
-        } 
-        else {
-            element.target.classList.remove("shown")
-        }
-    })
-})
-
 
 const description = document.querySelector("#description")
 
-const descriptions = ["developer.","gamer.","student.","sussy baka."]
+const descriptions = ["developer.","gamer.","student.", "tech enthusiast."]
 
 function startAnim(){
-    let delay = 150 //in ms
+    let delay = 135 //in ms
     let deleting = true
     let i = 0 //word index  
     let i2 = 0 //char index
@@ -57,30 +45,31 @@ function startAnim(){
 }
 
 
+const obeserver = new IntersectionObserver((elements) => {
+    elements.forEach((element) => {
+        console.log(element)
+        if (element.isIntersecting) {
+            element.target.classList.add("shown")
+        } 
+        else {
+            element.target.classList.remove("shown")
+        }
+    })
+})
+
 const hidden_elements = document.querySelectorAll(".hidden")
 hidden_elements.forEach((el) => obeserver.observe(el))
 
 
-// returns current scroll progress for the entire site as a float between 0 and 1
+// returns current scroll progress as a float between 0 and 1
 
-function siteScrollProgress() {
+function scrollProgress() {
     return ((document.documentElement.scrollTop + document.body.scrollTop) / (document.documentElement.scrollHeight - document.documentElement.clientHeight))
 }
 
-// returns current scroll progress for an element as a float between 0 and 1
-function element_scroll_progress(selector) {
-    let element = document.querySelector(selector)
-    let element_space = element.offsetHeight / document.documentElement.scrollHeight
-    let element_progress = siteScrollProgress() / element_space
-    if(element_progress > 1) {
-        element_progress = 1
-    }
-
-    return element_progress
-}
 
 window.addEventListener("scroll", function() {
-    this.document.body.style.setProperty("--about-scroll-progress", element_scroll_progress("#about"))
+    this.document.body.style.setProperty("--scroll-progress", scrollProgress())
 })
 
 // returns an inbetween value, between end and start value given the progress as a float between 0 and 1

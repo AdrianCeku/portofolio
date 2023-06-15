@@ -3,22 +3,23 @@ import "/style.css"
 const canvas = document.querySelector("#game")
 const ctx = canvas.getContext("2d")
 
-const resolutionScale = 10
-canvas.width = 170 * resolutionScale
-canvas.height = 130 * resolutionScale
+canvas.width = 1700
+canvas.height = 1300
 
 window.addEventListener("load", function () {
 class InputHandler {
   constructor(game) {
     this.game = game
     this.acceptedInputs = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "e", "E"]
+
     window.addEventListener("keydown", event => {
-      if ((this.acceptedInputs.includes(event.key)) &&  !(this.game.inputs.includes(event.key))) {
+      if ((this.acceptedInputs.includes(event.key)) && !(this.game.inputs.includes(event.key))) {
         this.game.inputs.push(event.key)
       }
       console.log(this.game.inputs)
       event.preventDefault()
     })
+
     window.addEventListener("keyup", event => {
       if (this.game.inputs.includes(event.key)) {
         this.game.inputs.splice(this.game.inputs.indexOf(event.key), 1)
@@ -32,33 +33,35 @@ class InputHandler {
 class Player {
   constructor(game) {
     this.game = game
-    this.width = 120
     this.height = 190
-    this.x = 0
-    this.y = 0
+    this.width = 120
+    this.x = 130
+    this.y = 550
     this.speedX = 0
     this.speedY = 0
     this.speedMultiplier = 10
+    this.padding = 50
   }
   update() {
     this.speedX = 0
     this.speedY = 0
-    if (this.game.inputs.includes("ArrowUp")) {
-      this.speedY -= 1 * this.speedMultiplier
-    }
-    if (this.game.inputs.includes("ArrowDown")) {
-      this.speedY += 1 * this.speedMultiplier
-    }
-    if (this.game.inputs.includes("ArrowLeft")) {
-      this.speedX -= 1 * this.speedMultiplier
-    }
-    if (this.game.inputs.includes("ArrowRight")) {
-      this.speedX += 1 * this.speedMultiplier
-    }
+      if (this.game.inputs.includes("ArrowUp") && this.y > 0) {
+        this.speedY -= 1 * this.speedMultiplier
+      }
+      if (this.game.inputs.includes("ArrowDown") && this.y < canvas.height - (this.height + this.padding)) {
+        this.speedY += 1 * this.speedMultiplier
+      }
+    
+      if (this.game.inputs.includes("ArrowLeft") && this.x > 50) {
+        this.speedX -= 1 * this.speedMultiplier
+      }
+      if (this.game.inputs.includes("ArrowRight") && this.x < canvas.width - (this.width + this.padding )) {
+        this.speedX += 1 * this.speedMultiplier
+      }
+    
 
     this.y += this.speedY
     this.x += this.speedX
-    console.log(this.x, this.y)
   }
   draw(ctx) {
     ctx.fillStyle = "red"

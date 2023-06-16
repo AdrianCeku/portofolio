@@ -62,7 +62,7 @@ class Player {
     this.shotSpeed = 3
     this.projectileWidth = 100
     this.projectileHeight = 30
-    this.damage = 10
+    this.damage = 50
     this.health = 100
   }
 
@@ -95,6 +95,10 @@ class Player {
       this.ammoTimer = 0
     }
     if(this.shotTimer < this.shotInterval) this.shotTimer += deltaTime 
+
+    if(this.health <= 0) {
+      this.game.gameOver = true
+    }
   }
 
   draw(ctx) {
@@ -129,7 +133,9 @@ class Enemy {
     this.projectileHeight = 30
     this.damage = randomInt(30,15)
     this.health = randomInt(200,50)
+    this.dropchance = 0.1
     this.markedForDeletion = false
+    this.score = 20
 
   }
   
@@ -140,6 +146,10 @@ class Enemy {
     if (this.shotTimer >= this.shotInterval) {
       this.shoot()
       this.shotTimer = 0
+    }
+    if(this.health <= 0) {
+      this.markedForDeletion = true
+      this.game.score += this.score
     }
   }
 
@@ -161,11 +171,13 @@ class Ship extends Enemy {
     super(game, shooting)
     this.height = 190
     this.width = 120
-    this.speedMultiplier = (Math.random() + 0.01) * 2 
+    this.speedMultiplier = Math.random() * 2 + 0.15
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
     this.projectileDamage = randomInt(30,15)
     this.collisionDamage = randomInt(45,35)
-    this.health = randomInt(125,75)  
+    this.health = randomInt(125,75)
+    this.dropchance = 0.1  
+    this.score = 20
   }
 }
 
@@ -174,11 +186,13 @@ class Speeder extends Enemy {
     super(game, shooting)
     this.height = 100
     this.width = 200
-    this.speedMultiplier = (Math.random() + 0.2) * 3 
+    this.speedMultiplier = (Math.random() + 0.25) * 3
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
     this.projectileDamage = randomInt(20,10)
     this.collisionDamage = randomInt(30,15)
     this.health = randomInt(50,25)
+    this.dropchance = 0.5
+    this.score = 60
   }
 }
 
@@ -187,11 +201,13 @@ class Tank extends Enemy {
     super(game, shooting)
     this.height = 250
     this.width = 250
-    this.speedMultiplier = Math.random() + 0.1
+    this.speedMultiplier = Math.random() + 0.01
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
     this.projectileDamage = randomInt(75,50)
     this.collisionDamage = randomInt(100,80)
     this.health = randomInt(200,125)
+    this.dropchance = 0.25
+    this.score = 30
   }
 }
 
@@ -280,7 +296,7 @@ class Game {
     this.enemySpawnInterval = 2000 // startvalue, only in ms if spawnAcceleration is 1
     this.spawnAcceleration = 1
     this.spawnAccelerationTimer = 0
-    this.spawnAccelerationInterval = 210000 // in ms
+    this.spawnAccelerationInterval = 20000 // in ms
     this.enemies = []
     this.enemyProjectiles = []
   }
@@ -302,6 +318,12 @@ class Game {
     //player projectiles 
     this.playerProjectiles.forEach(projectile => {
       projectile.update(deltaTime)
+      this.enemies.forEach(enemy => {
+        if (this.checkCollision(projectile, enemy)) {
+          projectile.markedForDeletion = true
+          enemy.health -= projectile.damage
+          }
+        })
       if (projectile.markedForDeletion) {
         this.playerProjectiles.splice(this.playerProjectiles.indexOf(projectile), 1)
       }
@@ -310,11 +332,15 @@ class Game {
     //enemies
     this.enemySpawnTimer += deltaTime * this.spawnAcceleration
     if (this.enemySpawnTimer >= this.enemySpawnInterval) {
-      this.enemies.push(randomEnemy(this, chance(1)))
+      this.enemies.push(randomEnemy(this, chance(0.3)))
       this.enemySpawnTimer = 0
     }
     this.enemies.forEach(enemy => {
       enemy.update(deltaTime)
+      if (this.checkCollision(enemy, this.player)) {
+        this.player.health -= enemy.collisionDamage
+        enemy.markedForDeletion = true
+      }
       if (enemy.markedForDeletion) {
         this.enemies.splice(this.enemies.indexOf(enemy), 1)
       }
@@ -323,6 +349,10 @@ class Game {
     //enemy projectiles
     this.enemyProjectiles.forEach(projectile => {
       projectile.update(deltaTime)
+      if(this.checkCollision(projectile, this.player)) {
+        this.player.health -= projectile.damage
+        projectile.markedForDeletion = true
+      }
       if (projectile.markedForDeletion) {
         this.enemyProjectiles.splice(this.enemyProjectiles.indexOf(projectile), 1)
       }
@@ -345,6 +375,13 @@ class Game {
     })
 
     this.ui.draw(ctx)
+  }
+
+  checkCollision(object1, object2) {
+    return (object1.x < object2.x + object2.width &&
+            object1.x + object1.width > object2.x &&
+            object1.y < object2.y + object2.height &&
+            object1.height + object1.y > object2.y)
   }
 }
 

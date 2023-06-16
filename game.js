@@ -62,7 +62,7 @@ class Player {
     this.shotSpeed = 3
     this.projectileWidth = 100
     this.projectileHeight = 30
-    this.damage = 50
+    this.damage = 25
     this.health = 100
   }
 
@@ -148,8 +148,7 @@ class Enemy {
       this.shotTimer = 0
     }
     if(this.health <= 0) {
-      this.markedForDeletion = true
-      this.game.score += this.score
+      this.destory()
     }
   }
 
@@ -162,6 +161,14 @@ class Enemy {
     if(this.shooting && this.ammo > 0) {
       this.game.enemyProjectiles.push(new Projectile(this.game, this.x - this.projectileWidth - 0.1, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage))
       this.ammo --
+    }
+  }
+
+  destory() {
+    this.markedForDeletion = true
+    game.score += this.score
+    if(Math.random() < this.dropchance) {
+      this.game.powerups.push(new Powerup(this.game, this.x, this.y))
     }
   }
 }
@@ -192,7 +199,7 @@ class Speeder extends Enemy {
     this.collisionDamage = randomInt(30,15)
     this.health = randomInt(50,25)
     this.dropchance = 0.5
-    this.score = 60
+    this.score = 40
   }
 }
 
@@ -211,16 +218,7 @@ class Tank extends Enemy {
   }
 }
 
-function randomEnemy(game, shooting) {
-  let random = Math.random()
-  if (random < 0.2) {
-    return new Tank(game, shooting)
-  } else if (random < 0.4) {
-    return new Speeder(game, shooting)
-  } else {
-    return new Ship(game, shooting)
-  }
-}
+
 class Projectile {
   constructor(game, x, y, width, height, speed, damage) {
     this.game = game
@@ -228,13 +226,13 @@ class Projectile {
     this.y = y
     this.width = width
     this.height = height
-    this.speed = speed
+    this.speedX = speed
     this.damage = damage
     this.markedForDeletion = false
   }
 
   update(deltaTime) {
-    this.x += this.speed * deltaTime
+    this.x += this.speedX * deltaTime
     if (this.x + this.width < 0 || this.x - this.width > 1700 ) this.markedForDeletion = true
   }
 
@@ -243,6 +241,17 @@ class Projectile {
     ctx.fillRect(this.x, this.y, this.width, this.height)
   }
 }
+
+class BouncingProjectile extends Projectile {
+  constructor(game, x, y, width, height, speed, damage) {
+  }
+
+  update(deltaTime) {
+
+  }
+}
+
+
 
 class Particle {
 
@@ -299,6 +308,7 @@ class Game {
     this.spawnAccelerationInterval = 20000 // in ms
     this.enemies = []
     this.enemyProjectiles = []
+    this.powerups = []
   }
   update(deltaTime) {
     this.gameTime += deltaTime
@@ -332,7 +342,7 @@ class Game {
     //enemies
     this.enemySpawnTimer += deltaTime * this.spawnAcceleration
     if (this.enemySpawnTimer >= this.enemySpawnInterval) {
-      this.enemies.push(randomEnemy(this, chance(0.3)))
+      this.enemies.push(this.randomEnemy(this, chance(0.3)))
       this.enemySpawnTimer = 0
     }
     this.enemies.forEach(enemy => {
@@ -382,6 +392,17 @@ class Game {
             object1.x + object1.width > object2.x &&
             object1.y < object2.y + object2.height &&
             object1.height + object1.y > object2.y)
+  }
+
+  randomEnemy(game, shooting) {
+    let random = Math.random()
+    if (random < 0.2) {
+      return new Tank(game, shooting)
+    } else if (random < 0.4) {
+      return new Speeder(game, shooting)
+    } else {
+      return new Ship(game, shooting)
+    }
   }
 }
 

@@ -24,7 +24,7 @@ window.addEventListener("load", function () {
 class InputHandler {
   constructor(game) {
     this.game = game
-    this.acceptedInputs = ["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "e", "f"]
+    this.acceptedInputs = ["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "e", "f", "x"]
 
     window.addEventListener("keydown", event => {
       if ((this.acceptedInputs.includes(event.key.toLowerCase())) && !(this.game.currentInputs.includes(event.key.toLowerCase()))) {
@@ -121,6 +121,7 @@ class Enemy {
     this.speedX = -1
     this.speedMultiplier = Math.random() * 2 + 0.1
     this.shooting = shooting
+    this.ammo = randomInt(10,3)
     this.shotTimer = 0
     this.shotInterval = randomInt(1000,250) // in ms
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
@@ -148,8 +149,9 @@ class Enemy {
   }
   
   shoot() {
-    if(this.shooting) {
+    if(this.shooting && this.ammo > 0) {
       this.game.enemyProjectiles.push(new Projectile(this.game, this.x - this.projectileWidth - 0.1, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage))
+      this.ammo --
     }
   }
 }
@@ -268,6 +270,7 @@ class Game {
     this.height = height
     this.gameTime = 0 // in ms
     this.score = 0
+    this.gameOver = false
     this.inputhandler = new InputHandler(this)
     this.player = new Player(this)
     this.ui = new UI(this)
@@ -287,6 +290,8 @@ class Game {
 
     this.ui.update(deltaTime)
 
+    if(this.currentInputs.includes("x")) this.gameOver = true
+
     this.spawnAccelerationTimer += deltaTime
     if (this.spawnAccelerationTimer >= this.spawnAccelerationInterval) {
       this.spawnAcceleration *= 1.1
@@ -305,7 +310,7 @@ class Game {
     //enemies
     this.enemySpawnTimer += deltaTime * this.spawnAcceleration
     if (this.enemySpawnTimer >= this.enemySpawnInterval) {
-      this.enemies.push(randomEnemy(this, chance(0.3)))
+      this.enemies.push(randomEnemy(this, chance(1)))
       this.enemySpawnTimer = 0
     }
     this.enemies.forEach(enemy => {
@@ -343,7 +348,11 @@ class Game {
   }
 }
 
-const game = new Game(canvas.width, canvas.height)
+var game = new Game(canvas.width, canvas.height)
+
+function startNewGame(){
+  game = new Game(canvas.width, canvas.height)
+}
 
 let lastTime = 0
 function animate(timeStamp) {
@@ -353,6 +362,9 @@ function animate(timeStamp) {
   game.update(deltaTime)
   game.draw(ctx)
   requestAnimationFrame(animate)
+  if (game.gameOver) {
+    startNewGame()
+  }
 }
 
 animate(0)

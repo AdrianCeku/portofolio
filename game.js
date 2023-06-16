@@ -24,7 +24,7 @@ window.addEventListener("load", function () {
 class InputHandler {
   constructor(game) {
     this.game = game
-    this.acceptedInputs = ["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "e"]
+    this.acceptedInputs = ["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "e", "f"]
 
     window.addEventListener("keydown", event => {
       if ((this.acceptedInputs.includes(event.key.toLowerCase())) && !(this.game.currentInputs.includes(event.key.toLowerCase()))) {
@@ -58,7 +58,7 @@ class Player {
     this.maxAmmo = 25
     this.currentAmmo = 20
     this.ammoTimer = 0
-    this.ammoInterval = 750 // in ms
+    this.ammoInterval = 500 // in ms
     this.shotSpeed = 3
     this.projectileWidth = 100
     this.projectileHeight = 30
@@ -89,7 +89,6 @@ class Player {
       this.game.player.shoot()
     }
 
-    console.log(this.x + " " + this.y)
     if(this.currentAmmo < this.maxAmmo && this.ammoTimer < this.ammoInterval) this.ammoTimer += deltaTime
     if(this.ammoTimer >= this.ammoInterval) {
       this.currentAmmo ++
@@ -150,11 +149,60 @@ class Enemy {
   
   shoot() {
     if(this.shooting) {
-      this.game.enemyProjectiles.push(new Projectile(this.game, this.x - this.projectileWidth - 0.1, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage))
+      this.game.enemyProjectiles.push(new Projectile(this.game, this.x - this.projectileWidth - 0.1, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage))
     }
   }
 }
 
+class Ship extends Enemy {
+  constructor(game, shooting) {
+    super(game, shooting)
+    this.height = 190
+    this.width = 120
+    this.speedMultiplier = (Math.random() + 0.01) * 2 
+    this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
+    this.projectileDamage = randomInt(30,15)
+    this.collisionDamage = randomInt(45,35)
+    this.health = randomInt(125,75)  
+  }
+}
+
+class Speeder extends Enemy {
+  constructor(game, shooting) {
+    super(game, shooting)
+    this.height = 100
+    this.width = 200
+    this.speedMultiplier = (Math.random() + 0.2) * 3 
+    this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
+    this.projectileDamage = randomInt(20,10)
+    this.collisionDamage = randomInt(30,15)
+    this.health = randomInt(50,25)
+  }
+}
+
+class Tank extends Enemy {
+  constructor(game, shooting) {
+    super(game, shooting)
+    this.height = 250
+    this.width = 250
+    this.speedMultiplier = Math.random() + 0.1
+    this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
+    this.projectileDamage = randomInt(75,50)
+    this.collisionDamage = randomInt(100,80)
+    this.health = randomInt(200,125)
+  }
+}
+
+function randomEnemy(game, shooting) {
+  let random = Math.random()
+  if (random < 0.2) {
+    return new Tank(game, shooting)
+  } else if (random < 0.4) {
+    return new Speeder(game, shooting)
+  } else {
+    return new Ship(game, shooting)
+  }
+}
 class Projectile {
   constructor(game, x, y, width, height, speed, damage) {
     this.game = game
@@ -201,7 +249,9 @@ class UI {
     this.fontFamily = "dashhorizon"
     this.color = "white"
   }
-
+  update(deltaTime) {
+    this.fps = Math.round(1000/deltaTime)
+  }
   draw(ctx) {
     ctx.fillStyle = this.color
     ctx.font = this.fontSize + "px " + this.fontFamily
@@ -209,6 +259,7 @@ class UI {
     ctx.fillText("Ammo: " + game.player.currentAmmo, 50, 200)
     ctx.fillText("Time: " + Math.round(game.gameTime/1000) + "s", 1150, 100)
     ctx.fillText("Score: " + game.score, 1150, 200)
+    if (this.game.currentInputs.includes("f")) ctx.fillText("FPS: " + this.fps, 70, 1220)
   }
 }
 class Game {
@@ -226,13 +277,15 @@ class Game {
     this.enemySpawnInterval = 2000 // startvalue, only in ms if spawnAcceleration is 1
     this.spawnAcceleration = 1
     this.spawnAccelerationTimer = 0
-    this.spawnAccelerationInterval = 20000 // in ms
+    this.spawnAccelerationInterval = 210000 // in ms
     this.enemies = []
     this.enemyProjectiles = []
   }
   update(deltaTime) {
     this.gameTime += deltaTime
     this.player.update(deltaTime)
+
+    this.ui.update(deltaTime)
 
     this.spawnAccelerationTimer += deltaTime
     if (this.spawnAccelerationTimer >= this.spawnAccelerationInterval) {
@@ -252,7 +305,7 @@ class Game {
     //enemies
     this.enemySpawnTimer += deltaTime * this.spawnAcceleration
     if (this.enemySpawnTimer >= this.enemySpawnInterval) {
-      this.enemies.push(new Enemy(this, chance(0.3)))
+      this.enemies.push(randomEnemy(this, chance(0.3)))
       this.enemySpawnTimer = 0
     }
     this.enemies.forEach(enemy => {

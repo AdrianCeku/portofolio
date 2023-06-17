@@ -52,7 +52,7 @@ class Player {
     this.padding = 50
     this.speedX = 0
     this.speedY = 0
-    this.speedMultiplier = 1
+    this.speedMultiplier = 1.3
     this.shotTimer = 0
     this.shotInterval = 100 // in ms
     this.maxAmmo = 25
@@ -164,9 +164,6 @@ class Enemy {
       this.shoot()
       this.shotTimer = 0
     }
-    if(this.health <= 0) {
-      this.destory()
-    }
   }
 
   draw(ctx) {
@@ -179,6 +176,11 @@ class Enemy {
       this.game.enemyProjectiles.push(new Projectile(this.game, this.x - this.projectileWidth - 0.1, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage))
       this.ammo --
     }
+  }
+
+  takeDamage(damage) {
+    this.health -= damage
+    if(this.health <= 0) this.destory()
   }
 
   destory() {
@@ -228,8 +230,8 @@ class Tank extends Enemy {
     this.speedMultiplier = Math.random() + 0.01
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
     this.projectileDamage = randomInt(75,50)
-    this.collisionDamage = randomInt(100,80)
-    this.health = randomInt(200,125)
+    this.collisionDamage = randomInt(99,75)
+    this.health = randomInt(250,150)
     this.dropchance = 0.35
     this.score = 30
   }
@@ -398,16 +400,16 @@ class DamagePowerup extends Powerup {
 class SpeedPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "blue")
-    this.duration = 10000
+    this.duration = 12000
     this.name = "Speed Boost"
   }
   startEffect() {
     super.startEffect()
-    this.game.player.speedMultiplier = 2
+    this.game.player.speedMultiplier *= 1.5
   }
   endEffect() {
     super.endEffect()
-    this.game.player.speedMultiplier = 1
+    this.game.player.speedMultiplier /= 1.5
   }
 }
 
@@ -578,7 +580,7 @@ class Game {
       this.enemies.forEach(enemy => {
         if (this.checkCollision(projectile, enemy)) {
           projectile.markedForDeletion = true
-          enemy.health -= projectile.damage
+          enemy.takeDamage(projectile.damage)
           }
         })
       if (projectile.markedForDeletion) {

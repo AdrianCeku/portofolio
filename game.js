@@ -24,7 +24,7 @@ window.addEventListener("load", function () {
 class InputHandler {
   constructor(game) {
     this.game = game
-    this.acceptedInputs = ["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "e", "q", "f", "x", "enter"]
+    this.acceptedInputs = ["arrowup", "arrowdown", "arrowleft", "arrowright","w","a","s","d", " ", "e", "q", "f", "x", "enter"]
 
     window.addEventListener("keydown", event => {
       if ((this.acceptedInputs.includes(event.key.toLowerCase())) && !(this.game.currentInputs.includes(event.key.toLowerCase()))) {
@@ -72,16 +72,16 @@ class Player {
   update(deltaTime) {
     this.speedX = 0
     this.speedY = 0
-    if (this.game.currentInputs.includes("arrowup") && this.y > 0) {
+    if ((this.game.currentInputs.includes("arrowup") || this.game.currentInputs.includes("w")) && this.y > 0) {
       this.speedY -= 1 * this.speedMultiplier
     }
-    if (this.game.currentInputs.includes("arrowdown") && this.y < canvas.height - (this.height + this.padding)) {
+    if ((this.game.currentInputs.includes("arrowdown") || this.game.currentInputs.includes("s")) && this.y < canvas.height - (this.height + this.padding)) {
       this.speedY += 1 * this.speedMultiplier
     }
-    if (this.game.currentInputs.includes("arrowleft") && this.x > 50) {
+    if ((this.game.currentInputs.includes("arrowleft") || this.game.currentInputs.includes("a")) && this.x > 50) {
       this.speedX -= 1 * this.speedMultiplier
     }
-    if (this.game.currentInputs.includes("arrowright") && this.x < canvas.width - (this.width + this.padding )) {
+    if ((this.game.currentInputs.includes("arrowright") || this.game.currentInputs.includes("d")) && this.x < canvas.width - (this.width + this.padding )) {
       this.speedX += 1 * this.speedMultiplier
     }
     
@@ -125,6 +125,10 @@ class Player {
     this.game.endTime = this.game.gameTime
     this.unlimitedAmmo = true
     this.game.collectedPowerups = []
+    this.game.enemies = []
+    this.game.playerProjectiles = []
+    this.game.enemyProjectiles = []
+    this.game.powerups = []
   }
   }
 }
@@ -274,10 +278,6 @@ class BouncingProjectile extends Projectile {
 
 
 class Particle {
-
-}
-
-class Layer {
 
 }
 
@@ -658,7 +658,6 @@ class Game {
 
     else if (this.gameState == "gameover") {
       this.gameOverUI.update(deltaTime)
-      this.enemies = []
     }
   }
   
@@ -720,19 +719,19 @@ class Game {
     if (random < 1/numberOfPowerups) {
       return new InvincibilityPowerup(game, x, y, width, height)
     }
-    else if (random < 2/numberOfPowerups) {
+    else if (random <= 2/numberOfPowerups) {
       return new AmmoPowerup(game, x, y, width, height)
     }
-    else if (random < 3/numberOfPowerups) {
+    else if (random <= 3/numberOfPowerups) {
       return new DamagePowerup(game, x, y, width, height)
     }
-    else if (random < 4/numberOfPowerups) {
+    else if (random <= 4/numberOfPowerups) {
       return new HealthPowerup(game, x, y, width, height)
     }
-    else if (random < 5/numberOfPowerups) {
+    else if (random <= 5/numberOfPowerups) {
       return new SpeedPowerup(game, x, y, width, height)
     }
-    else if (random < 6/numberOfPowerups) {
+    else if (random <= 6/numberOfPowerups) {
       return new BulletPowerup(game, x, y, width, height)
     }
   }

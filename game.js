@@ -66,6 +66,7 @@ class Player {
     this.damage = 25
     this.health = 100
     this.invincible = false
+    this.bouncingBullets = false
   }
 
   update(deltaTime) {
@@ -109,6 +110,10 @@ class Player {
     if (this.currentAmmo > 0 && this.shotTimer >= this.shotInterval) {
       if(this.unlimitedAmmo == false) this.currentAmmo --
       this.game.playerProjectiles.push(new Projectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage))
+      if(this.bouncingBullets == true) {
+        this.game.playerProjectiles.push(new BouncingProjectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed))
+        this.game.playerProjectiles.push(new BouncingProjectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed * -1))
+      } 
       this.shotTimer = 0
     }
   }
@@ -138,7 +143,7 @@ class Enemy {
     this.shotTimer = 1000
     this.shotInterval = randomInt(1000,250) // in ms
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.35
-    this.projectileWidth = 100
+    this.projectileWidth = 70
     this.projectileHeight = 30
     this.damage = randomInt(30,15)
     this.health = randomInt(200,50)
@@ -236,6 +241,7 @@ class Projectile {
     this.height = height
     this.speedX = speed
     this.damage = damage
+    this.speedY  = this.game.player.shotSpeed
     this.markedForDeletion = false
   }
 
@@ -251,12 +257,18 @@ class Projectile {
 }
 
 class BouncingProjectile extends Projectile {
-  constructor(game, x, y, width, height, speed, damage) {
+  constructor(game, x, y, width, height, speed, damage, speedY) {
+    super(game, x, y, width, height, speed, damage)
+    this.padding = 50
+    this.speedY = speedY
   }
 
   update(deltaTime) {
-
+    super.update(deltaTime)
+    this.y += this.speedY * deltaTime
+    if (this.y + this.height + this.padding > canvas.height || this.y < 0 + this.padding) this.speedY *= -1
   }
+
 }
 
 
@@ -288,6 +300,8 @@ class Powerup {
     this.activated = false
     this.markedForDeletion = false
     this.slot = 0
+    this.showText = false
+    this.name = "Powerup"
   }
   update(deltaTime) {
     if(this.pickedUp == false){ 
@@ -314,6 +328,10 @@ class Powerup {
     else if(this.activated == false){
       ctx.fillRect(this.x, this.y, this.height, this.width)
     }
+    if(this.showText == true) {
+      if(this.slot == 1) ctx.fillText(this.name, 550, 100)
+      if(this.slot == 2) ctx.fillText(this.name, 550, 200)
+    }
   }
 
   onPickup() {
@@ -322,6 +340,7 @@ class Powerup {
   
   startEffect() {
     this.activated = true
+    this.showText = true
   }
   
   endEffect() {
@@ -333,6 +352,7 @@ class InvincibilityPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "purple")
     this.duration = 2500
+    this.name = "Invincibility"
   }
   startEffect() {
     super.startEffect()
@@ -347,6 +367,7 @@ class AmmoPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "orange")
     this.duration = 5000
+    this.name = "Unlimited Ammo"
   }
   startEffect() {
     super.startEffect()
@@ -362,6 +383,7 @@ class DamagePowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "red")
     this.duration = 7500
+    this.name = "Double Damage"
   }
   startEffect() {
     super.startEffect()
@@ -377,6 +399,7 @@ class SpeedPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "blue")
     this.duration = 10000
+    this.name = "Speed Boost"
   }
   startEffect() {
     super.startEffect()
@@ -391,11 +414,29 @@ class SpeedPowerup extends Powerup {
 class HealthPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "green")
-    this.duration = 0
+    this.duration = 200
+    this.name = "Health Boost"
   }
   startEffect() {
     super.startEffect()
     this.game.player.health += 50
+  }
+}
+
+class BulletPowerup extends Powerup {
+  constructor(game, x, y, width, height) {
+    super(game, x, y, width, height, "white")
+    this.duration = 3500
+    this.name = "Bouncing Bullets"
+  }
+  startEffect() {
+    super.startEffect()
+    this.game.player.bouncingBullets = true
+  }
+
+  endEffect() {
+    super.endEffect()
+    this.game.player.bouncingBullets = false
   }
 }
 
@@ -674,20 +715,26 @@ class Game {
   }
 
   randomPowerup(game, x, y, width, height) {
+    let numberOfPowerups = 6
     let random = Math.random()
-    if (random < 0.2) {
+    if (random < 1/numberOfPowerups) {
       return new InvincibilityPowerup(game, x, y, width, height)
     }
-    else if (random < 0.4) {
+    else if (random < 2/numberOfPowerups) {
       return new AmmoPowerup(game, x, y, width, height)
     }
-    else if (random < 0.6) {
+    else if (random < 3/numberOfPowerups) {
       return new DamagePowerup(game, x, y, width, height)
     }
-    else if (random < 0.8) {
+    else if (random < 4/numberOfPowerups) {
       return new HealthPowerup(game, x, y, width, height)
     }
-    else return new SpeedPowerup(game, x, y, width, height)
+    else if (random < 5/numberOfPowerups) {
+      return new SpeedPowerup(game, x, y, width, height)
+    }
+    else if (random < 6/numberOfPowerups) {
+      return new BulletPowerup(game, x, y, width, height)
+    }
   }
 }
 

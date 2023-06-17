@@ -45,8 +45,8 @@ class InputHandler {
 class Player {
   constructor(game) {
     this.game = game
-    this.height = 190
-    this.width = 120
+    this.height = 120
+    this.width = 190
     this.x = 130
     this.y = 550
     this.padding = 50
@@ -300,10 +300,10 @@ class Powerup {
     this.duration = 1000
     this.pickedUp = false
     this.activated = false
-    this.markedForDeletion = false
     this.slot = 0
     this.showText = false
     this.name = "Powerup"
+    this.markedForDeletion = false
   }
   update(deltaTime) {
     if(this.pickedUp == false){ 
@@ -356,10 +356,12 @@ class InvincibilityPowerup extends Powerup {
     this.duration = 2500
     this.name = "Invincibility"
   }
+
   startEffect() {
     super.startEffect()
     this.game.player.invincible = true
   }
+
   endEffect() {
     super.endEffect()
     this.game.player.invincible = false
@@ -371,10 +373,12 @@ class AmmoPowerup extends Powerup {
     this.duration = 5000
     this.name = "Unlimited Ammo"
   }
+
   startEffect() {
     super.startEffect()
     this.game.player.unlimitedAmmo = true
   }
+
   endEffect() {
     super.endEffect()
     this.game.player.unlimitedAmmo = false
@@ -387,10 +391,12 @@ class DamagePowerup extends Powerup {
     this.duration = 7500
     this.name = "Double Damage"
   }
+
   startEffect() {
     super.startEffect()
     this.game.player.damage *= 2
   }
+
   endEffect() {
     super.endEffect()
     this.game.player.unlimitedAmmo /= 2
@@ -403,10 +409,12 @@ class SpeedPowerup extends Powerup {
     this.duration = 12000
     this.name = "Speed Boost"
   }
+
   startEffect() {
     super.startEffect()
     this.game.player.speedMultiplier *= 1.5
   }
+
   endEffect() {
     super.endEffect()
     this.game.player.speedMultiplier /= 1.5
@@ -419,6 +427,7 @@ class HealthPowerup extends Powerup {
     this.duration = 200
     this.name = "Health Boost"
   }
+
   startEffect() {
     super.startEffect()
     this.game.player.health += 50
@@ -431,6 +440,7 @@ class BulletPowerup extends Powerup {
     this.duration = 3500
     this.name = "Bouncing Bullets"
   }
+
   startEffect() {
     super.startEffect()
     this.game.player.bouncingBullets = true
@@ -467,7 +477,12 @@ class UI {
   draw(ctx) {
     ctx.fillStyle = this.color
     ctx.font = this.fontSize + "px " + this.fontFamily
-    if (this.game.currentInputs.includes("f")) ctx.fillText("FPS: " + this.fps, 70, 1220)
+    if (this.game.currentInputs.includes("f")) {
+      ctx.font = "75px " + this.fontFamily
+      ctx.fillText("FPS: " + this.fps, 70, 1220)
+      ctx.fillText("EPS: " + Math.round(this.game.spawnAcceleration/2*100)/100, 350, 1220)
+      ctx.font = this.fontSize + "px " + this.fontFamily
+    }
   }
 }
 
@@ -490,7 +505,7 @@ class MainMenuUI extends UI {
   draw(ctx) {
     ctx.font = "200px " + this.fontFamily
     ctx.fillStyle = "yellow"
-    ctx.fillText("Space Shooter", 350, 300)
+    ctx.fillText("Horizon    Strike", 300, 300)
     super.draw(ctx)
     if (this.visible == true) {
     ctx.fillText("Press Enter to Start", 300, 1100)
@@ -600,7 +615,6 @@ class Game {
       if (this.spawnAccelerationTimer >= this.spawnAccelerationInterval) {
         this.spawnAcceleration *= 1.1
         this.spawnAccelerationTimer = 0
-        console.log(this.spawnAcceleration)
       }
   
       //enemies

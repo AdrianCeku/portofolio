@@ -452,6 +452,7 @@ class BulletPowerup extends Powerup {
   }
 }
 
+
 class UI {
   constructor(game) {
     this.game = game

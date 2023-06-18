@@ -4,3 +4,5 @@ Arcade 3d model:	"Arcade Game Machine 001" (https://skfb.ly/ozIIz) by @sanyabeas
 3d background dark: 	https://unsplash.com/de/fotos/UWY8nGROvbk
 3d background light:	https://wallpaperaccess.com/orange-space-4k
 font spacegame: 	https://www.dafont.com/dash.font
+spacegame background:	https://norma-2d.itch.io/space-backgrounds-pack
+spacegame planets: 	https://deep-fold.itch.io/pixel-planet-generator

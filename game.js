@@ -399,7 +399,7 @@ class DamagePowerup extends Powerup {
 
   endEffect() {
     super.endEffect()
-    this.game.player.unlimitedAmmo /= 2
+    this.game.player.damage /= 2
   }
 }
 
@@ -580,7 +580,7 @@ class Game {
     this.enemySpawnInterval = 2000 // startvalue, only in ms if spawnAcceleration is 1
     this.spawnAcceleration = 1
     this.spawnAccelerationTimer = 0
-    this.spawnAccelerationInterval = 20000 // in ms
+    this.spawnAccelerationInterval = 15000 // in ms
     this.enemies = []
     this.enemyProjectiles = []
     this.powerups = []

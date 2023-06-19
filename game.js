@@ -3,6 +3,8 @@ import "/style.css"
 const canvas = document.querySelector("#game")
 const ctx = canvas.getContext("2d")
 
+ctx.imageSmoothingEnabled = false
+
 canvas.width = 1700
 canvas.height = 1300
 
@@ -472,7 +474,7 @@ class Background {
   constructor(game) {
     this.game = game
     this.layers = []
-    this.backgroundLayers = [new backgroundLayer(this.game, 0.03, 1700, 1300, 0), new backgroundLayer(this.game, 0.03, 1700, 1300, 1700)]
+    this.backgroundLayers = [new backgroundLayer(this.game, 0.02, 1700, 1300, 0), new backgroundLayer(this.game, 0.02, 1700, 1300, 1700)]
     this.timer = 0
     this.timerInterval = 0
     this.planetInterval = 25000
@@ -504,7 +506,7 @@ class Background {
                             asteroid4Sprite
                             ]
     this.blackholeSprites = [blackholeSprite]
-    this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], 300/6000, 300, 300))
+    this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], 300/6000 + 0.012, 300, 300))
   }
 
   update(deltaTime) {

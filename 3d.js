@@ -71,7 +71,7 @@ cameraGroup.add(skydome)
 scene.add(cameraGroup)
 
 function updateSkydome() {
-    if(darkmode == true) {
+    if(darkmode) {
         scene.background = backgroundTextureDark
         skydome.material.map = skydomeTextureDark
         ambientLight.color.set(0xffffff)
@@ -82,7 +82,7 @@ function updateSkydome() {
         scene.background = backgroundTextureLight
         skydome.material.map = skydomeTextureLight
         ambientLight.color.set(0xffa500)
-        ambientLight.intensity = 0.5
+        ambientLight.intensity = 0.3
     }
 }
 

@@ -185,7 +185,7 @@ class Player {
     this.projectileHeight = 30
     this.damage = 25
     this.health = 100
-    this.invincible = true
+    this.invincible = false
     this.bouncingBullets = false
   }
 
@@ -475,7 +475,7 @@ class Background {
     this.backgroundLayers = [new backgroundLayer(this.game, 0.03, 1700, 1300, 0), new backgroundLayer(this.game, 0.03, 1700, 1300, 1700)]
     this.timer = 0
     this.timerInterval = 0
-    this.planetInterval = 45000
+    this.planetInterval = 25000
     this.starInterval = 1000
     this.galaxyInterval = 1000
     this.asteroidInterval = 1000
@@ -508,19 +508,19 @@ class Background {
   }
 
   update(deltaTime) {
+    this.backgroundLayers.forEach(layer => layer.update(deltaTime))
     this.layers.forEach(layer => {
       layer.update(deltaTime)
       if (layer.markedForDeletion) this.layers.splice(this.layers.indexOf(layer), 1)
     })
 
-    this.backgroundLayers.forEach(layer => layer.update(deltaTime))
 
     this.timer += deltaTime
     if(this.layerTimer > this.timerInterval) {
       this.timer = 0
     }
     if(this.timer > this.planetInterval) {
-      let size = randomInt(500, 50)
+      let size = randomInt(700, 50)
       this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], size/6000, size, size))
       this.timer = 0
     }
@@ -529,8 +529,8 @@ class Background {
   }
 
   draw(ctx) {
-    this.layers.forEach(layer => layer.draw(ctx))
     this.backgroundLayers.forEach(layer => layer.draw(ctx))
+    this.layers.forEach(layer => layer.draw(ctx))
   }
 }
 

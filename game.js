@@ -20,6 +20,126 @@ function chance(percent) {
   else return false
 }
 
+//assets
+
+const playerSprite = new Image()
+playerSprite.src = "assets/game/player_ship.png"
+
+const enemyShipSprite = new Image()
+//enemyShipSprite.src = "assets/game/enemy_ship.png"
+
+const enemyTankSprite = new Image()
+//enemyTankSprite.src = "assets/game/enemy_tank.png"
+
+const enemySpeederSprite = new Image()
+//enemySpeederSprite.src = "assets/game/enemy_Speeder.png"
+
+const enemyBossSprite = new Image()
+//enemyBossSprite.src = "assets/game/enemy_boss.png"
+
+const playerProjectileSprite = new Image()
+//playerProjectileSprite.src = "assets/game/player_projectile.png"
+
+const enemyProjectileSprite = new Image()
+//enemyProjectileSprite.src = "assets/game/enemy_projectile.png"
+
+const powerupInvincibleSprite = new Image()
+//powerupInvincibleSprite.src = "assets/game/powerup_invincible.png"
+
+const powerupBouncingBulletsSprite = new Image()
+//powerupBouncingBulletsSprite.src = "assets/game/powerup_bouncingBullets.png"
+
+const powerupUnlimitedAmmoSprite = new Image()
+//powerupUnlimitedAmmoSprite.src = "assets/game/powerup_unlimitedammo.png"
+
+const powerupHealthSprite = new Image()
+//powerupHealthSprite.src = "assets/game/powerup_health.png"
+
+const powerupDamageSprite = new Image()
+//powerupDamageSprite.src = "assets/game/powerup_samage.png"
+
+const powerupSpeedSprite = new Image()
+//powerupSpeedSprite.src = "assets/game/powerup_speed.png"
+
+const alienPlanet1Sprite = new Image()
+alienPlanet1Sprite.src = "assets/game/alien_planet_1.png"
+
+const alienPlanet2Sprite = new Image()
+alienPlanet2Sprite.src = "assets/game/alien_planet_2.png"
+
+const bluePlanet1Sprite = new Image()
+bluePlanet1Sprite.src = "assets/game/blue_planet_1.png"
+
+const bluePlanet2Sprite = new Image()
+bluePlanet2Sprite.src = "assets/game/blue_planet_2.png"
+
+const redPlanet1Sprite = new Image()
+redPlanet1Sprite.src = "assets/game/red_planet_1.png"
+
+const redPlanet2Sprite = new Image()
+redPlanet2Sprite.src = "assets/game/red_planet_2.png"
+
+const icePlanet1Sprite = new Image()
+icePlanet1Sprite.src = "assets/game/ice_planet_1.png"
+
+const icePlanet2Sprite = new Image()
+icePlanet2Sprite.src = "assets/game/ice_planet_2.png"
+
+const lavaPlanet1Sprite = new Image()
+lavaPlanet1Sprite.src = "assets/game/lava_planet_1.png"
+
+const lavaPlanet2Sprite = new Image()
+lavaPlanet2Sprite.src = "assets/game/lava_planet_2.png"
+
+const ringedPlanet1Sprite = new Image()
+ringedPlanet1Sprite.src = "assets/game/ringed_planet_1.gif"
+
+const ringedPlanet2Sprite = new Image()
+ringedPlanet2Sprite.src = "assets/game/ringed_planet_2.gif"
+
+const gasGiant1Sprite = new Image()
+gasGiant1Sprite.src = "assets/game/gas_giant_1.png"
+
+const gasGiant2Sprite = new Image()
+gasGiant2Sprite.src = "assets/game/gas_giant_2.png"
+
+const galaxyBlueSprite = new Image()
+galaxyBlueSprite.src = "assets/game/galaxy_blue.gif"
+
+const galaxyGoldSprite = new Image()
+galaxyGoldSprite.src = "assets/game/galaxy_gold.gif"
+
+const galaxyGreenSprite = new Image()
+galaxyGreenSprite.src = "assets/game/galaxy_green.gif"
+
+const galaxyPinkSprite = new Image()
+galaxyPinkSprite.src = "assets/game/galaxy_pink.gif"
+
+const blackholeSprite = new Image()
+blackholeSprite.src = "assets/game/blackhole.png"
+
+const starSprite = new Image()
+starSprite.src = "assets/game/star.gif"
+
+const asteroid1Sprite = new Image()
+asteroid1Sprite.src = "assets/game/asteroid_1.png"
+
+const asteroid2Sprite = new Image()
+asteroid2Sprite.src = "assets/game/asteroid_2.png"
+
+const asteroid3Sprite = new Image()
+asteroid3Sprite.src = "assets/game/asteroid_3.png"
+
+const asteroid4Sprite = new Image()
+asteroid4Sprite.src = "assets/game/asteroid_4.png"
+
+const backgroundSprite = new Image()
+backgroundSprite.src = "assets/game/bg.png"
+
+
+
+
+
 window.addEventListener("load", function () {
 class InputHandler {
   constructor(game) {
@@ -65,7 +185,7 @@ class Player {
     this.projectileHeight = 30
     this.damage = 25
     this.health = 100
-    this.invincible = false
+    this.invincible = true
     this.bouncingBullets = false
   }
 
@@ -102,8 +222,9 @@ class Player {
   }
 
   draw(ctx) {
-    ctx.fillStyle = "blue"
-    ctx.fillRect(this.x, this.y, this.width, this.height)
+    //ctx.fillStyle = "blue"
+    //ctx.fillRect(this.x, this.y, this.width, this.height)
+    ctx.drawImage(playerSprite, this.x, this.y, this.width, this.height)
   }
 
   shoot() {
@@ -170,7 +291,7 @@ class Enemy {
     ctx.fillStyle = "red"
     ctx.fillRect(this.x, this.y, this.width, this.height)
   }
-  
+
   shoot() {
     if(this.shooting && this.ammo > 0) {
       this.game.enemyProjectiles.push(new Projectile(this.game, this.x - this.projectileWidth - 0.1, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage))
@@ -283,8 +404,86 @@ class Particle {
 
 }
 
-class Background {
+class Layer {
+  constructor(game, sprite, speed,  speedMultiplier, width, height ) {
+    this.game = game  
+    this.sprite = sprite
+    this.speed = speed 
+    this.speedMultiplier = speedMultiplier
+    this.width = width
+    this.height = height
+    this.x = 1700
+    this.y = randomInt(0, canvas.height - this.height)
+    this.markedForDeletion = false
+  }
 
+  update(deltaTime) {
+    this.x -= this.speed * this.speedMultiplier * deltaTime
+    if (this.x + this.width < 0) this.markedForDeletion = true
+  }
+
+  draw(ctx) {
+    console.log(this.sprite)
+    ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height)
+  
+  }
+}
+
+class Background {
+  constructor(game) {
+    this.game = game
+    this.layers = []
+    this.timer = 0
+    this.timerInterval = 0
+    this.planetInterval = 45000
+    this.starInterval = 1000
+    this.galaxyInterval = 1000
+    this.asteroidInterval = 1000
+    this.blackholeInterval = 1000
+    this.planetSprites = [  alienPlanet1Sprite,
+                            alienPlanet2Sprite,
+                            bluePlanet1Sprite,
+                            bluePlanet2Sprite,
+                            redPlanet1Sprite,
+                            redPlanet2Sprite,
+                            icePlanet1Sprite,
+                            icePlanet2Sprite,
+                            lavaPlanet1Sprite,
+                            lavaPlanet2Sprite,
+                            gasGiant1Sprite,
+                            gasGiant2Sprite
+                      ]
+    this.starSprites = [    starSprite]
+    this.galaxySprites = [  galaxyBlueSprite,
+                            galaxyGreenSprite,
+                            galaxyGoldSprite,
+                            galaxyPinkSprite]
+    this.asteroidSprites = [asteroid1Sprite,
+                            asteroid2Sprite,
+                            asteroid3Sprite,
+                            asteroid4Sprite
+                            ]
+    this.blackholeSprites = [blackholeSprite]
+
+    this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], 0.1, 0.5, 300, 300))
+  }
+
+  update(deltaTime) {
+    this.layers.forEach(layer => layer.update(deltaTime))
+    this.timer += deltaTime
+    if(this.layerTimer > this.timerInterval) {
+      this.timer = 0
+    }
+    if(this.timer > this.planetInterval) {
+      let size = randomInt(500, 50)
+      this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], 0.1, 0.5, size, size))
+      this.timer = 0
+    }
+  }
+
+  draw(ctx) {
+    this.layers.forEach(layer => layer.draw(ctx))
+  }
 }
 
 class Powerup {
@@ -574,6 +773,7 @@ class Game {
     this.mainMenuUI = new MainMenuUI(this)
     this.ingameUI = new IngameUI(this)
     this.gameOverUI = new GameOverUI(this)
+    this.background = new Background(this)
     this.currentInputs = []
     this.playerProjectiles = []
     this.enemySpawnTimer = 0
@@ -586,10 +786,12 @@ class Game {
     this.powerups = []
     this.collectedPowerups = []
     this.player.unlimitedAmmo = true
+
   }
   update(deltaTime) {
     this.gameTime += deltaTime
     this.player.update(deltaTime)
+    this.background.update(deltaTime)
     // player projectiles
     this.playerProjectiles.forEach(projectile => {
       projectile.update(deltaTime)
@@ -679,6 +881,8 @@ class Game {
   }
   
   draw(ctx) {
+    this.background.draw(ctx)
+
     this.player.draw(ctx)
     
     this.playerProjectiles.forEach(projectile => {

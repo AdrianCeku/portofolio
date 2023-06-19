@@ -239,7 +239,7 @@ main {
 }
 
 #game {
-    visibility: hidden;
+    visibility: show;
 }
 #qr-code {
     height: 100vh; 

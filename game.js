@@ -399,7 +399,7 @@ class Projectile {
 
   draw(ctx) {
     if(this.game.currentInputs.includes("f")) {
-      ctx.fillStyle = "yellow"
+      ctx.fillStyle = "green"
       ctx.fillRect(this.x, this.y, this.width, this.height)
     } 
     if(this.playerProjectile) {
@@ -456,10 +456,23 @@ class Layer {
   }
 }
 
+class backgroundLayer extends Layer {
+  constructor(game, speedMultiplier, width, height, x) {
+    super(game, backgroundSprite, speedMultiplier, width, height)
+    this.x = x
+  }
+
+  update(deltaTime) {
+    this.x -= this.speed * this.speedMultiplier * deltaTime
+    if (this.x + this.width <= 0) this.x = 1700
+  }
+}
+
 class Background {
   constructor(game) {
     this.game = game
     this.layers = []
+    this.backgroundLayers = [new backgroundLayer(this.game, 0.03, 1700, 1300, 0), new backgroundLayer(this.game, 0.03, 1700, 1300, 1700)]
     this.timer = 0
     this.timerInterval = 0
     this.planetInterval = 45000
@@ -499,6 +512,9 @@ class Background {
       layer.update(deltaTime)
       if (layer.markedForDeletion) this.layers.splice(this.layers.indexOf(layer), 1)
     })
+
+    this.backgroundLayers.forEach(layer => layer.update(deltaTime))
+
     this.timer += deltaTime
     if(this.layerTimer > this.timerInterval) {
       this.timer = 0
@@ -508,11 +524,13 @@ class Background {
       this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], size/6000, size, size))
       this.timer = 0
     }
+
     console.log(this.layers)
   }
 
   draw(ctx) {
     this.layers.forEach(layer => layer.draw(ctx))
+    this.backgroundLayers.forEach(layer => layer.draw(ctx))
   }
 }
 

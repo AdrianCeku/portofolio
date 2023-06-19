@@ -405,15 +405,15 @@ class Particle {
 }
 
 class Layer {
-  constructor(game, sprite, speed,  speedMultiplier, width, height ) {
+  constructor(game, sprite, speedMultiplier, width, height ) {
     this.game = game  
     this.sprite = sprite
-    this.speed = speed 
+    this.speed = 1 
     this.speedMultiplier = speedMultiplier
     this.width = width
     this.height = height
-    this.x = 1700
-    this.y = randomInt(0, canvas.height - this.height)
+    this.x = 1800
+    this.y = randomInt(canvas.height - this.height, 0)
     this.markedForDeletion = false
   }
 
@@ -423,7 +423,6 @@ class Layer {
   }
 
   draw(ctx) {
-    console.log(this.sprite)
     ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height)
   
   }
@@ -464,21 +463,24 @@ class Background {
                             asteroid4Sprite
                             ]
     this.blackholeSprites = [blackholeSprite]
-
-    this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], 0.1, 0.5, 300, 300))
+    this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], 300/6000, 300, 300))
   }
 
   update(deltaTime) {
-    this.layers.forEach(layer => layer.update(deltaTime))
+    this.layers.forEach(layer => {
+      layer.update(deltaTime)
+      if (layer.markedForDeletion) this.layers.splice(this.layers.indexOf(layer), 1)
+    })
     this.timer += deltaTime
     if(this.layerTimer > this.timerInterval) {
       this.timer = 0
     }
     if(this.timer > this.planetInterval) {
       let size = randomInt(500, 50)
-      this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], 0.1, 0.5, size, size))
+      this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], size/6000, size, size))
       this.timer = 0
     }
+    console.log(this.layers)
   }
 
   draw(ctx) {

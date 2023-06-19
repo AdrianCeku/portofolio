@@ -23,43 +23,43 @@ function chance(percent) {
 //assets
 
 const playerSprite = new Image()
-playerSprite.src = "assets/game/player_ship.png"
+playerSprite.src = "assets/game/player.png"
 
 const enemyShipSprite = new Image()
-//enemyShipSprite.src = "assets/game/enemy_ship.png"
+enemyShipSprite.src = "assets/game/enemy_ship.png"
 
 const enemyTankSprite = new Image()
-//enemyTankSprite.src = "assets/game/enemy_tank.png"
+enemyTankSprite.src = "assets/game/enemy_tank.png"
 
 const enemySpeederSprite = new Image()
-//enemySpeederSprite.src = "assets/game/enemy_Speeder.png"
+enemySpeederSprite.src = "assets/game/enemy_Speeder.png"
 
 const enemyBossSprite = new Image()
-//enemyBossSprite.src = "assets/game/enemy_boss.png"
+enemyBossSprite.src = "assets/game/enemy_boss.png"
 
 const playerProjectileSprite = new Image()
-//playerProjectileSprite.src = "assets/game/player_projectile.png"
+playerProjectileSprite.src = "assets/game/player_projectile.png"
 
 const enemyProjectileSprite = new Image()
-//enemyProjectileSprite.src = "assets/game/enemy_projectile.png"
+enemyProjectileSprite.src = "assets/game/enemy_projectile.png"
 
 const powerupInvincibleSprite = new Image()
-//powerupInvincibleSprite.src = "assets/game/powerup_invincible.png"
+powerupInvincibleSprite.src = "assets/game/powerup_invincible.png"
 
-const powerupBouncingBulletsSprite = new Image()
-//powerupBouncingBulletsSprite.src = "assets/game/powerup_bouncingBullets.png"
+const powerupBulletSprite = new Image()
+powerupBulletSprite.src = "assets/game/powerup_bullets.png"
 
-const powerupUnlimitedAmmoSprite = new Image()
-//powerupUnlimitedAmmoSprite.src = "assets/game/powerup_unlimitedammo.png"
+const powerupAmmoSprite = new Image()
+powerupAmmoSprite.src = "assets/game/powerup_ammo.png"
 
 const powerupHealthSprite = new Image()
-//powerupHealthSprite.src = "assets/game/powerup_health.png"
+powerupHealthSprite.src = "assets/game/powerup_health.png"
 
 const powerupDamageSprite = new Image()
-//powerupDamageSprite.src = "assets/game/powerup_samage.png"
+powerupDamageSprite.src = "assets/game/powerup_damage.png"
 
 const powerupSpeedSprite = new Image()
-//powerupSpeedSprite.src = "assets/game/powerup_speed.png"
+powerupSpeedSprite.src = "assets/game/powerup_speed.png"
 
 const alienPlanet1Sprite = new Image()
 alienPlanet1Sprite.src = "assets/game/alien_planet_1.png"
@@ -222,18 +222,20 @@ class Player {
   }
 
   draw(ctx) {
-    //ctx.fillStyle = "blue"
-    //ctx.fillRect(this.x, this.y, this.width, this.height)
+    if(this.game.currentInputs.includes("f")) {
+      ctx.fillStyle = "blue"
+      ctx.fillRect(this.x, this.y, this.width, this.height)
+    }
     ctx.drawImage(playerSprite, this.x, this.y, this.width, this.height)
   }
 
   shoot() {
     if (this.currentAmmo > 0 && this.shotTimer >= this.shotInterval) {
       if(this.unlimitedAmmo == false) this.currentAmmo --
-      this.game.playerProjectiles.push(new Projectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage))
+      this.game.playerProjectiles.push(new Projectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, true))
       if(this.bouncingBullets == true) {
-        this.game.playerProjectiles.push(new BouncingProjectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed))
-        this.game.playerProjectiles.push(new BouncingProjectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed * -1))
+        this.game.playerProjectiles.push(new BouncingProjectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed, true))
+        this.game.playerProjectiles.push(new BouncingProjectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed * -1, true))
       } 
       this.shotTimer = 0
     }
@@ -288,8 +290,10 @@ class Enemy {
   }
 
   draw(ctx) {
-    ctx.fillStyle = "red"
-    ctx.fillRect(this.x, this.y, this.width, this.height)
+    if(this.game.currentInputs.includes("f")) {
+      ctx.fillStyle = "red"
+      ctx.fillRect(this.x, this.y, this.width, this.height)
+    }
   }
 
   shoot() {
@@ -308,7 +312,7 @@ class Enemy {
     this.markedForDeletion = true
     game.score += this.score
     if(Math.random() <= this.dropchance) {
-      this.game.powerups.push(this.game.randomPowerup(this.game, this.x, this.y, 50, 50))
+      this.game.powerups.push(this.game.randomPowerup(this.game, this.x, this.y, 100, 100))
     }
   }
 }
@@ -326,6 +330,11 @@ class Ship extends Enemy {
     this.dropchance = 0.2  
     this.score = 20
   }
+
+  draw(ctx) {
+    super.draw(ctx)
+    ctx.drawImage(enemyShipSprite, this.x, this.y, this.width, this.height)
+  }
 }
 
 class Speeder extends Enemy {
@@ -341,7 +350,13 @@ class Speeder extends Enemy {
     this.dropchance = 0.5
     this.score = 40
   }
+
+  draw(ctx) {
+    super.draw(ctx)
+    ctx.drawImage(enemySpeederSprite, this.x, this.y, this.width, this.height)
+  }
 }
+
 
 class Tank extends Enemy {
   constructor(game, shooting) {
@@ -356,11 +371,15 @@ class Tank extends Enemy {
     this.dropchance = 0.35
     this.score = 30
   }
+  draw(ctx) {
+    super.draw(ctx)
+    ctx.drawImage(enemyTankSprite, this.x, this.y, this.width, this.height)
+  }
 }
 
 
 class Projectile {
-  constructor(game, x, y, width, height, speed, damage) {
+  constructor(game, x, y, width, height, speed, damage, playerProjectile = false) {
     this.game = game
     this.x = x
     this.y = y
@@ -369,6 +388,7 @@ class Projectile {
     this.speedX = speed
     this.damage = damage
     this.speedY  = this.game.player.shotSpeed
+    this.playerProjectile = playerProjectile
     this.markedForDeletion = false
   }
 
@@ -378,14 +398,22 @@ class Projectile {
   }
 
   draw(ctx) {
-    ctx.fillStyle = "yellow"
-    ctx.fillRect(this.x, this.y, this.width, this.height)
+    if(this.game.currentInputs.includes("f")) {
+      ctx.fillStyle = "yellow"
+      ctx.fillRect(this.x, this.y, this.width, this.height)
+    } 
+    if(this.playerProjectile) {
+      ctx.drawImage(playerProjectileSprite, this.x, this.y, this.width, this.height)
+    }
+    else {
+      ctx.drawImage(enemyProjectileSprite, this.x, this.y, this.width, this.height)
+    }
   }
 }
 
 class BouncingProjectile extends Projectile {
-  constructor(game, x, y, width, height, speed, damage, speedY) {
-    super(game, x, y, width, height, speed, damage)
+  constructor(game, x, y, width, height, speed, damage, speedY, playerProjectile = false) {
+    super(game, x, y, width, height, speed, damage, playerProjectile)
     this.padding = 50
     this.speedY = speedY
   }
@@ -505,6 +533,7 @@ class Powerup {
     this.showText = false
     this.name = "Powerup"
     this.markedForDeletion = false
+    this.sprite = powerupHealthSprite
   }
   update(deltaTime) {
     if(this.pickedUp == false){ 
@@ -524,12 +553,13 @@ class Powerup {
 
   draw(ctx) {
     ctx.fillStyle = this.color
+    console.log(this.sprite)
     if(this.pickedUp == true) {
-      if(this.slot == 1) ctx.fillRect(70, 250, 50, 50)
-      if(this.slot == 2) ctx.fillRect(170, 250, 50, 50)
+      if(this.slot == 1) ctx.drawImage(this.sprite, 75, 250, 75, 75)
+      if(this.slot == 2) ctx.drawImage(this.sprite, 200, 250, 75, 75)
     }
     else if(this.activated == false){
-      ctx.fillRect(this.x, this.y, this.height, this.width)
+      ctx.drawImage(this.sprite, this.x, this.y, this.height, this.width)
     }
     if(this.showText == true) {
       if(this.slot == 1) ctx.fillText(this.name, 550, 100)
@@ -553,9 +583,10 @@ class Powerup {
 
 class InvincibilityPowerup extends Powerup {
   constructor(game, x, y, width, height) {
-    super(game, x, y, width, height, "purple")
+    super(game, x, y, width, height, "gold")
     this.duration = 2500
     this.name = "Invincibility"
+    this.sprite = powerupInvincibleSprite
   }
 
   startEffect() {
@@ -570,9 +601,10 @@ class InvincibilityPowerup extends Powerup {
 }
 class AmmoPowerup extends Powerup {
   constructor(game, x, y, width, height) {
-    super(game, x, y, width, height, "orange")
+    super(game, x, y, width, height, "turquoise")
     this.duration = 5000
     this.name = "Unlimited Ammo"
+    this.sprite = powerupAmmoSprite
   }
 
   startEffect() {
@@ -591,6 +623,7 @@ class DamagePowerup extends Powerup {
     super(game, x, y, width, height, "red")
     this.duration = 7500
     this.name = "Double Damage"
+    this.sprite = powerupDamageSprite
   }
 
   startEffect() {
@@ -609,6 +642,7 @@ class SpeedPowerup extends Powerup {
     super(game, x, y, width, height, "blue")
     this.duration = 12000
     this.name = "Speed Boost"
+    this.sprite = powerupSpeedSprite
   }
 
   startEffect() {
@@ -624,9 +658,10 @@ class SpeedPowerup extends Powerup {
 
 class HealthPowerup extends Powerup {
   constructor(game, x, y, width, height) {
-    super(game, x, y, width, height, "green")
+    super(game, x, y, width, height, "red")
     this.duration = 200
     this.name = "Health Boost"
+    this.sprite = powerupHealthSprite
   }
 
   startEffect() {
@@ -637,9 +672,10 @@ class HealthPowerup extends Powerup {
 
 class BulletPowerup extends Powerup {
   constructor(game, x, y, width, height) {
-    super(game, x, y, width, height, "white")
+    super(game, x, y, width, height, "green")
     this.duration = 3500
     this.name = "Bouncing Bullets"
+    this.sprite = powerupBulletSprite
   }
 
   startEffect() {
@@ -808,7 +844,7 @@ class Game {
       }
     })
 
-    if(this.currentInputs.includes("x")) this.powerups.push(this.randomPowerup(this, 1700, randomInt(1700,0), 50, 50))
+    if(this.currentInputs.includes("x")) this.powerups.push(this.randomPowerup(this, 1700, randomInt(1700,0), 100, 100))
 
     if (this.gameState == "mainmenu") {
       this.mainMenuUI.update(deltaTime)

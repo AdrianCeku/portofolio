@@ -497,6 +497,18 @@ class Layer {
   
 }
 
+class CloudLayer extends Layer {
+  constructor(game, speedMultiplier, width, height, x) {
+    super(game, cloudsSprite, speedMultiplier, width, height, false)
+    this.x = x
+  }
+
+  update(deltaTime) {
+    this.x -= this.speed * this.speedMultiplier * deltaTime
+    if (this.x + this.width <= 0) this.x = 1699
+    }
+  }
+
 class SparklingLayer extends Layer {
   constructor(game, sprite, speedMultiplier, width, height, sparkling = true, sparkleInterval = 25, sparkleSize = 4, sparkleColor = "white" ) {
     super(game, sprite, speedMultiplier, width, height)
@@ -552,33 +564,7 @@ class BackgroundColor extends SparklingLayer {
 
 }
 
-class CloudLayer extends SparklingLayer {
-  constructor(game, speedMultiplier, width, height, x) {
-    super(game, cloudsSprite, speedMultiplier, width, height, false)
-    this.x = x
-  }
 
-  update(deltaTime) {
-    this.x -= this.speed * this.speedMultiplier * deltaTime
-    if (this.x + this.width <= 0) this.x = 1699
-    if (this.sparkling){ 
-      if (this.sparkleTimer >= this.sparkleInterval) {
-        this.sparkleTimer = 0
-        this.sparkle()
-      }
-    this.sparkleTimer += deltaTime
-    }
-    this.layerParticles.forEach(particle => {
-      particle.update(deltaTime)
-      if(particle.markedForDeletion) this.layerParticles.splice(this.layerParticles.indexOf(particle), 1)
-    })
-  }
-
-  draw(ctx) {
-    super.draw(ctx)
-    this.layerParticles.forEach(particle => particle.draw(ctx))
-  }
-}
 
 class Background {
   constructor(game) {

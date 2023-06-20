@@ -462,8 +462,8 @@ class Particle {
   update(deltaTime) {
     this.x += this.speedX * deltaTime
     this.y += this.speedY * deltaTime
-    this.lifeTime -= deltaTime
     if (this.lifeTime <= 0) this.markedForDeletion = true
+    else this.lifeTime -= deltaTime
   }
 
   draw(ctx) {
@@ -506,6 +506,7 @@ class SparklingLayer extends Layer {
     this.sparkleSize = sparkleSize
     this.sparkleColor = sparkleColor
     this.layerParticles = []
+    this.bg_color = false
   }
 
   update(deltaTime) {
@@ -525,7 +526,7 @@ class SparklingLayer extends Layer {
   }
 
   sparkle() {
-    this.layerParticles.push(new Particle(this.game, randomInt(this.x,this.x - this.width), randomInt(this.y, this.y + this.height), this.sparkleSize, this.sparkleSize, 0, 0, this.sparkleColor, 500))
+    this.layerParticles.push(new Particle(this.game, randomInt(this.x,this.x - this.width), randomInt(this.y, this.y + this.height), this.sparkleSize, this.sparkleSize, 0, 0, this.sparkleColor, 5000))
   }
 }
 
@@ -533,17 +534,27 @@ class BackgroundColor extends SparklingLayer {
   constructor(game, color) {
     super(game, null, 0, canvas.width, canvas.height, true)
     this.color = color
+    this.x = 0
+    this.y = 0
+  }
+  update(deltaTime) {
+    super.update(deltaTime)
   }
 
   draw(ctx) {
     ctx.fillStyle = this.color
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }
+
+  sparkle() {
+    this.game.background.backgroundParticles.push(new Particle(this.game, randomInt(canvas.width, 0), randomInt(canvas.height, 0), this.sparkleSize, this.sparkleSize, 0, 0, this.sparkleColor, 500))
+  }
+
 }
 
 class CloudLayer extends SparklingLayer {
   constructor(game, speedMultiplier, width, height, x) {
-    super(game, cloudsSprite, speedMultiplier, width, height, true)
+    super(game, cloudsSprite, speedMultiplier, width, height, false)
     this.x = x
   }
 
@@ -576,6 +587,7 @@ class Background {
     this.backgroundLayers = [new CloudLayer(this.game, 0.02, 1700, 1300, 0), new CloudLayer(this.game, 0.02, 1700, 1300, 1700)]
     this.foregroundLayers = []
     this.backgroundColor = new BackgroundColor(this.game, "#141d27")
+    this.backgroundParticles = []
     this.planetInterval = 25000
     this.starTimer = randomInt(900000, 0)
     this.starInterval = 100000
@@ -621,8 +633,13 @@ class Background {
   }
 
   update(deltaTime) {
+    
     this.backgroundColor.update(deltaTime)
     this.backgroundLayers.forEach(layer => layer.update(deltaTime))
+    this.backgroundParticles.forEach(particle => {
+      particle.update(deltaTime)
+      if(particle.markedForDeletion) this.backgroundParticles.splice(this.backgroundParticles.indexOf(particle), 1)
+    })
     this.layers.forEach(layer => {
       layer.update(deltaTime)
       if (layer.markedForDeletion) this.layers.splice(this.layers.indexOf(layer), 1)
@@ -643,7 +660,7 @@ class Background {
     }
     if(this.galaxyTimer > this.galaxyInterval) {
       let size = randomInt(400, 200)
-      let distance = 6000//randomInt(80000, 50000)
+      let distance = randomInt(40000, 20000)
       console.log("spawn galaxy")
       this.backgroundLayers.unshift(new Layer(this.game, this.galaxySprites[randomInt(this.galaxySprites.length - 1, 0)], size/distance, size, size))
       this.galaxyTimer = 0
@@ -665,7 +682,7 @@ class Background {
     if(this.asteroidTimer > this.asteroidInterval) {
       let size = randomInt(200, 50)
       let distance = randomInt(1000, 100)
-      console.log("spawn as4teroid")
+      console.log("spawn asteroid")
       if(Math.random() < 0.25) this.foregroundLayers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
       else this.layers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
       this.asteroidTimer = 0
@@ -675,6 +692,7 @@ class Background {
 
   draw(ctx) {
     this.backgroundColor.draw(ctx)
+    this.backgroundParticles.forEach(particle => particle.draw(ctx))
     this.backgroundLayers.forEach(layer => layer.draw(ctx))
     this.layers.forEach(layer => layer.draw(ctx))
   }
@@ -979,7 +997,6 @@ class Game {
     this.currentInputs = []
     this.playerProjectiles = []
     this.particles = []
-    this.backgroundParticles = []
     this.enemySpawnTimer = 0
     this.enemySpawnInterval = 2000 // startvalue, only in ms if spawnAcceleration is 1
     this.spawnAcceleration = 1

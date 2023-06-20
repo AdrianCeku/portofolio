@@ -135,11 +135,26 @@ asteroid3Sprite.src = "assets/game/asteroid_3.png"
 const asteroid4Sprite = new Image()
 asteroid4Sprite.src = "assets/game/asteroid_4.png"
 
+const asteroid5Sprite = new Image()
+asteroid5Sprite.src = "assets/game/asteroid_5.png"
+
+const asteroid6Sprite = new Image()
+asteroid6Sprite.src = "assets/game/asteroid_6.png"
+
+const asteroid7Sprite = new Image()
+asteroid7Sprite.src = "assets/game/asteroid_7.png"
+
+const asteroid8Sprite = new Image()
+asteroid8Sprite.src = "assets/game/asteroid_8.png"
+
+const asteroid9Sprite = new Image()
+asteroid9Sprite.src = "assets/game/asteroid_9.png"
+
+const asteroid10Sprite = new Image()
+asteroid10Sprite.src = "assets/game/asteroid_10.png"
+
 const cloudsSprite = new Image()
 cloudsSprite.src = "assets/game/bg_clouds.png"
-
-
-
 
 
 window.addEventListener("load", function () {
@@ -569,7 +584,7 @@ class Background {
     this.asteroidTimer = 0
     this.asteroidInterval = 5000
     this.blackholeTimer = 0
-    this.blackholeInterval = 40000
+    this.blackholeInterval = 100000
     this.planetSprites = [  alienPlanet1Sprite,
                             alienPlanet2Sprite,
                             bluePlanet1Sprite,
@@ -591,10 +606,16 @@ class Background {
     this.asteroidSprites = [asteroid1Sprite,
                             asteroid2Sprite,
                             asteroid3Sprite,
-                            asteroid4Sprite
+                            asteroid4Sprite,
+                            asteroid5Sprite,
+                            asteroid6Sprite,
+                            asteroid7Sprite,
+                            asteroid8Sprite,
+                            asteroid9Sprite,
+                            asteroid10Sprite
                             ]
     this.blackholeSprites = [blackholeSprite]
-    let startingAsteroid = new Layer(this.game, asteroid1Sprite, 0.1, 200, 200)
+    let startingAsteroid = new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], 0.1, 200, 200)
     startingAsteroid.y = 200
     this.foregroundLayers.push(startingAsteroid)
   }
@@ -615,9 +636,9 @@ class Background {
     
     if(this.blackholeTimer > this.blackholeInterval) {
       let size = randomInt(200, 50)
-      let distance = randomInt(500000, 1000000)
+      let distance = randomInt(50000, 10000)
       console.log("spawn blackhole")
-      this.layers.unshift(new Layer(this.game, this.blackholeSprites[randomInt(this.blackholeSprites.length - 1, 0)], size/distance, size, size))
+      this.backgroundLayers.unshift(new Layer(this.game, this.blackholeSprites[randomInt(this.blackholeSprites.length - 1, 0)], size/distance + 0.0001, size, size))
       this.blackholeTimer = 0
     }
     if(this.galaxyTimer > this.galaxyInterval) {
@@ -628,7 +649,7 @@ class Background {
       this.galaxyTimer = 0
     }
     if(this.starTimer > this.starInterval) {
-      let size = randomInt(1000, 300)
+      let size = randomInt(500, 300)
       let distance = randomInt(15000, 10000)
       console.log("spawn star")
       this.layers.unshift(new Layer(this.game, this.starSprites[randomInt(this.starSprites.length - 1, 0)], size/distance, size, size))
@@ -645,7 +666,7 @@ class Background {
       let size = randomInt(200, 50)
       let distance = randomInt(1000, 100)
       console.log("spawn as4teroid")
-      if(Math.random() < 0.2) this.foregroundLayers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
+      if(Math.random() < 0.25) this.foregroundLayers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
       else this.layers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
       this.asteroidTimer = 0
       console.log(this.foregroundLayers)
@@ -998,7 +1019,7 @@ class Game {
       }
     })
 
-    if(this.currentInputs.includes("x")) this.powerups.push(this.randomPowerup(this, 1700, randomInt(1700,0), 100, 100))
+    if(this.currentInputs.includes("x")) this.background.asteroidTimer += 50000//this.powerups.push(this.randomPowerup(this, 1700, randomInt(1700,0), 100, 100))
 
 
     // menu specific

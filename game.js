@@ -532,7 +532,7 @@ class SparklingLayer extends Layer {
 
 class BackgroundColor extends SparklingLayer {
   constructor(game, color) {
-    super(game, null, 0, canvas.width, canvas.height, true)
+    super(game, null, 0, canvas.width, canvas.height, true, 15, 4, "white")
     this.color = color
     this.x = 0
     this.y = 0
@@ -560,7 +560,7 @@ class CloudLayer extends SparklingLayer {
 
   update(deltaTime) {
     this.x -= this.speed * this.speedMultiplier * deltaTime
-    if (this.x + this.width <= 0) this.x = 1700
+    if (this.x + this.width <= 0) this.x = 1699
     if (this.sparkling){ 
       if (this.sparkleTimer >= this.sparkleInterval) {
         this.sparkleTimer = 0
@@ -584,7 +584,7 @@ class Background {
   constructor(game) {
     this.game = game
     this.layers = []
-    this.backgroundLayers = [new CloudLayer(this.game, 0.02, 1700, 1300, 0), new CloudLayer(this.game, 0.02, 1700, 1300, 1700)]
+    this.backgroundLayers = [new CloudLayer(this.game, 0.02, 1700, 1300, 0), new CloudLayer(this.game, 0.02, 1700, 1300, 1699)]
     this.foregroundLayers = []
     this.backgroundColor = new BackgroundColor(this.game, "#141d27")
     this.backgroundParticles = []

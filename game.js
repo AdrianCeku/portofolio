@@ -118,7 +118,7 @@ const galaxyPinkSprite = new Image()
 galaxyPinkSprite.src = "assets/game/galaxy_pink.gif"
 
 const blackholeSprite = new Image()
-blackholeSprite.src = "assets/game/blackhole.png"
+blackholeSprite.src = "assets/game/black_hole.gif"
 
 const starSprite = new Image()
 starSprite.src = "assets/game/star.gif"
@@ -135,8 +135,8 @@ asteroid3Sprite.src = "assets/game/asteroid_3.png"
 const asteroid4Sprite = new Image()
 asteroid4Sprite.src = "assets/game/asteroid_4.png"
 
-const backgroundSprite = new Image()
-backgroundSprite.src = "assets/game/bg.png"
+const cloudsSprite = new Image()
+cloudsSprite.src = "assets/game/bg_clouds.png"
 
 
 
@@ -187,7 +187,7 @@ class Player {
     this.projectileHeight = 30
     this.damage = 25
     this.health = 100
-    this.invincible = false
+    this.invincible = true
     this.bouncingBullets = false
   }
 
@@ -264,7 +264,7 @@ class Enemy {
     this.height = 190
     this.width = 120
     this.x = 1700
-    this.y = randomInt(canvas.height - this.height, 0)
+    this.y = randomInt(canvas.height - this.height-50, 0)
     this.speedX = -1
     this.speedMultiplier = Math.random() * 2 + 0.1
     this.shooting = shooting
@@ -431,42 +431,126 @@ class BouncingProjectile extends Projectile {
 
 
 class Particle {
+  constructor(game, x, y, width, height, speedX, speedY, color, lifeTime) {
+    this.game = game
+    this.x = x
+    this.y = y
+    this.width = width
+    this.height = height
+    this.speedX = speedX
+    this.speedY = speedY
+    this.color = color
+    this.lifeTime = lifeTime
+    this.markedForDeletion = false
+  }
 
+  update(deltaTime) {
+    this.x += this.speedX * deltaTime
+    this.y += this.speedY * deltaTime
+    this.lifeTime -= deltaTime
+    if (this.lifeTime <= 0) this.markedForDeletion = true
+  }
+
+  draw(ctx) {
+    ctx.fillStyle = this.color
+    ctx.fillRect(this.x, this.y, this.width, this.height)
+  }
 }
 
 class Layer {
-  constructor(game, sprite, speedMultiplier, width, height ) {
+  constructor(game, sprite, speedMultiplier, width, height, sparkling = false, sparkleInterval = 500, sparkleSize = 5, sparkleColor = "white" ) {
     this.game = game  
     this.sprite = sprite
     this.speed = 1 
     this.speedMultiplier = speedMultiplier
     this.width = width
     this.height = height
-    this.x = 1800
+    this.x = 1700
     this.y = randomInt(canvas.height - this.height, 0)
     this.markedForDeletion = false
+    
+  }
+  
+  update(deltaTime) {
+    this.x -= this.speed * this.speedMultiplier * deltaTime
+    if (this.x + this.width < 0) this.markedForDeletion = true
+  }
+  
+  draw(ctx) {
+    ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height)
+  }
+  
+}
+
+class SparklingLayer extends Layer {
+  constructor(game, sprite, speedMultiplier, width, height, sparkling = true, sparkleInterval = 25, sparkleSize = 4, sparkleColor = "white" ) {
+    super(game, sprite, speedMultiplier, width, height)
+    this.sparkling = sparkling
+    this.sparkleTimer = 0
+    this.sparkleInterval = sparkleInterval
+    this.sparkleSize = sparkleSize
+    this.sparkleColor = sparkleColor
+    this.layerParticles = []
   }
 
   update(deltaTime) {
     this.x -= this.speed * this.speedMultiplier * deltaTime
     if (this.x + this.width < 0) this.markedForDeletion = true
+    if (this.sparkling){ 
+      if (this.sparkleTimer >= this.sparkleInterval) {
+        this.sparkleTimer = 0
+        this.sparkle()
+      }
+      this.sparkleTimer += deltaTime
+    }
+    this.layerParticles.forEach(particle => {
+      particle.update(deltaTime)
+      if(particle.markedForDeletion) this.layerParticles.splice(this.layerParticles.indexOf(particle), 1)
+    })
   }
 
-  draw(ctx) {
-    ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height)
-  
+  sparkle() {
+    this.layerParticles.push(new Particle(this.game, randomInt(this.x,this.x - this.width), randomInt(this.y, this.y + this.height), this.sparkleSize, this.sparkleSize, 0, 0, this.sparkleColor, 500))
   }
 }
 
-class backgroundLayer extends Layer {
+class BackgroundColor extends SparklingLayer {
+  constructor(game, color) {
+    super(game, null, 0, canvas.width, canvas.height, true)
+    this.color = color
+  }
+
+  draw(ctx) {
+    ctx.fillStyle = this.color
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+  }
+}
+
+class CloudLayer extends SparklingLayer {
   constructor(game, speedMultiplier, width, height, x) {
-    super(game, backgroundSprite, speedMultiplier, width, height)
+    super(game, cloudsSprite, speedMultiplier, width, height, true)
     this.x = x
   }
 
   update(deltaTime) {
     this.x -= this.speed * this.speedMultiplier * deltaTime
     if (this.x + this.width <= 0) this.x = 1700
+    if (this.sparkling){ 
+      if (this.sparkleTimer >= this.sparkleInterval) {
+        this.sparkleTimer = 0
+        this.sparkle()
+      }
+    this.sparkleTimer += deltaTime
+    }
+    this.layerParticles.forEach(particle => {
+      particle.update(deltaTime)
+      if(particle.markedForDeletion) this.layerParticles.splice(this.layerParticles.indexOf(particle), 1)
+    })
+  }
+
+  draw(ctx) {
+    super.draw(ctx)
+    this.layerParticles.forEach(particle => particle.draw(ctx))
   }
 }
 
@@ -474,14 +558,18 @@ class Background {
   constructor(game) {
     this.game = game
     this.layers = []
-    this.backgroundLayers = [new backgroundLayer(this.game, 0.02, 1700, 1300, 0), new backgroundLayer(this.game, 0.02, 1700, 1300, 1700)]
-    this.timer = 0
-    this.timerInterval = 0
+    this.backgroundLayers = [new CloudLayer(this.game, 0.02, 1700, 1300, 0), new CloudLayer(this.game, 0.02, 1700, 1300, 1700)]
+    this.foregroundLayers = []
+    this.backgroundColor = new BackgroundColor(this.game, "#141d27")
     this.planetInterval = 25000
-    this.starInterval = 1000
-    this.galaxyInterval = 1000
-    this.asteroidInterval = 1000
-    this.blackholeInterval = 1000
+    this.starTimer = randomInt(900000, 0)
+    this.starInterval = 100000
+    this.galaxyTimer = randomInt(900000, 0)
+    this.galaxyInterval = 100000
+    this.asteroidTimer = 0
+    this.asteroidInterval = 5000
+    this.blackholeTimer = 0
+    this.blackholeInterval = 40000
     this.planetSprites = [  alienPlanet1Sprite,
                             alienPlanet2Sprite,
                             bluePlanet1Sprite,
@@ -506,31 +594,66 @@ class Background {
                             asteroid4Sprite
                             ]
     this.blackholeSprites = [blackholeSprite]
-    this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], 300/6000 + 0.012, 300, 300))
+    let startingAsteroid = new Layer(this.game, asteroid1Sprite, 0.1, 200, 200)
+    startingAsteroid.y = 200
+    this.foregroundLayers.push(startingAsteroid)
   }
 
   update(deltaTime) {
+    this.backgroundColor.update(deltaTime)
     this.backgroundLayers.forEach(layer => layer.update(deltaTime))
     this.layers.forEach(layer => {
       layer.update(deltaTime)
       if (layer.markedForDeletion) this.layers.splice(this.layers.indexOf(layer), 1)
     })
+    this.foregroundLayers.forEach(layer => {
+      layer.update(deltaTime)
+      if (layer.markedForDeletion) this.foregroundLayers.splice(this.foregroundLayers.indexOf(layer), 1)
+    })
+    this.planetTimer += deltaTime, this.starTimer+= deltaTime, this.galaxyTimer+= deltaTime, this.asteroidTimer+= deltaTime, this.blackholeTimer += deltaTime
 
-
-    this.timer += deltaTime
-    if(this.layerTimer > this.timerInterval) {
-      this.timer = 0
+    
+    if(this.blackholeTimer > this.blackholeInterval) {
+      let size = randomInt(200, 50)
+      let distance = randomInt(500000, 1000000)
+      console.log("spawn blackhole")
+      this.layers.unshift(new Layer(this.game, this.blackholeSprites[randomInt(this.blackholeSprites.length - 1, 0)], size/distance, size, size))
+      this.blackholeTimer = 0
     }
-    if(this.timer > this.planetInterval) {
+    if(this.galaxyTimer > this.galaxyInterval) {
+      let size = randomInt(400, 200)
+      let distance = 6000//randomInt(80000, 50000)
+      console.log("spawn galaxy")
+      this.backgroundLayers.unshift(new Layer(this.game, this.galaxySprites[randomInt(this.galaxySprites.length - 1, 0)], size/distance, size, size))
+      this.galaxyTimer = 0
+    }
+    if(this.starTimer > this.starInterval) {
+      let size = randomInt(1000, 300)
+      let distance = randomInt(15000, 10000)
+      console.log("spawn star")
+      this.layers.unshift(new Layer(this.game, this.starSprites[randomInt(this.starSprites.length - 1, 0)], size/distance, size, size))
+      this.starTimer = 0
+    }
+    if(this.planetTimer > this.planetInterval) {
       let size = randomInt(700, 50)
-      this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], size/6000, size, size))
-      this.timer = 0
+      let distance = randomInt(8000, 5000)
+      console.log("spawn planet")
+      this.layers.push(new Layer(this.game, this.planetSprites[randomInt(this.planetSprites.length - 1, 0)], size/distance, size, size))
+      this.planetTimer = 0
     }
-
-    console.log(this.layers)
+    if(this.asteroidTimer > this.asteroidInterval) {
+      let size = randomInt(200, 50)
+      let distance = randomInt(1000, 100)
+      console.log("spawn as4teroid")
+      if(Math.random() < 0.2) this.foregroundLayers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
+      else this.layers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
+      this.asteroidTimer = 0
+      console.log(this.foregroundLayers)
+    }
   }
 
   draw(ctx) {
+    this.backgroundColor.draw(ctx)
     this.backgroundLayers.forEach(layer => layer.draw(ctx))
     this.layers.forEach(layer => layer.draw(ctx))
   }
@@ -573,7 +696,6 @@ class Powerup {
 
   draw(ctx) {
     ctx.fillStyle = this.color
-    console.log(this.sprite)
     if(this.pickedUp == true) {
       if(this.slot == 1) ctx.drawImage(this.sprite, 75, 250, 75, 75)
       if(this.slot == 2) ctx.drawImage(this.sprite, 200, 250, 75, 75)
@@ -739,6 +861,7 @@ class UI {
       ctx.font = "75px " + this.fontFamily
       ctx.fillText("FPS: " + this.fps, 70, 1220)
       ctx.fillText("EPS: " + Math.round(this.game.spawnAcceleration/2*100)/100, 350, 1220)
+      ctx.fillText("APS: " + Math.round(1000/this.game.player.ammoInterval*100)/100, 650, 1220)
       ctx.font = this.fontSize + "px " + this.fontFamily
     }
   }
@@ -834,6 +957,8 @@ class Game {
     this.background = new Background(this)
     this.currentInputs = []
     this.playerProjectiles = []
+    this.particles = []
+    this.backgroundParticles = []
     this.enemySpawnTimer = 0
     this.enemySpawnInterval = 2000 // startvalue, only in ms if spawnAcceleration is 1
     this.spawnAcceleration = 1
@@ -850,6 +975,15 @@ class Game {
     this.gameTime += deltaTime
     this.player.update(deltaTime)
     this.background.update(deltaTime)
+
+    // particles
+    this.particles.forEach(particle => {
+      particle.update(deltaTime)
+      if (particle.markedForDeletion) {
+        this.particles.splice(this.particles.indexOf(particle), 1)
+      }
+    })
+
     // player projectiles
     this.playerProjectiles.forEach(projectile => {
       projectile.update(deltaTime)
@@ -866,6 +1000,8 @@ class Game {
 
     if(this.currentInputs.includes("x")) this.powerups.push(this.randomPowerup(this, 1700, randomInt(1700,0), 100, 100))
 
+
+    // menu specific
     if (this.gameState == "mainmenu") {
       this.mainMenuUI.update(deltaTime)
     }
@@ -875,6 +1011,7 @@ class Game {
       this.spawnAccelerationTimer += deltaTime
       if (this.spawnAccelerationTimer >= this.spawnAccelerationInterval) {
         this.spawnAcceleration *= 1.1
+        this.player.ammoInterval *= 0.95
         this.spawnAccelerationTimer = 0
       }
   
@@ -936,12 +1073,19 @@ class Game {
     else if (this.gameState == "gameover") {
       this.gameOverUI.update(deltaTime)
     }
+
+    //end menu specific
   }
   
   draw(ctx) {
     this.background.draw(ctx)
-
+    
+    this.particles.forEach(particle => {
+      particle.draw(ctx)
+    })
+    
     this.player.draw(ctx)
+  
     
     this.playerProjectiles.forEach(projectile => {
       projectile.draw(ctx)
@@ -972,6 +1116,10 @@ class Game {
     else if (this.gameState == "gameover") {
       this.gameOverUI.draw(ctx)
     }
+
+    this.background.foregroundLayers.forEach(layer => {
+      layer.draw(ctx)
+    })
   }
 
   checkCollision(object1, object2) {

@@ -564,9 +564,6 @@ class BackgroundColor extends SparklingLayer {
     this.x = 0
     this.y = 0
   }
-  update(deltaTime) {
-    super.update(deltaTime)
-  }
 
   draw(ctx) {
     ctx.fillStyle = this.color
@@ -585,7 +582,8 @@ class Background {
   constructor(game) {
     this.game = game
     this.layers = []
-    this.backgroundLayers = [new CloudLayer(this.game, 0.02, 1700, 1300, 0), new CloudLayer(this.game, 0.02, 1700, 1300, 1699)]
+    this.backgroundSpeed = 0.007
+    this.backgroundLayers = [new CloudLayer(this.game, this.backgroundSpeed, 1700, 1300, 0), new CloudLayer(this.game, this.backgroundSpeed, 1700, 1300, 1699)]
     this.foregroundLayers = []
     this.backgroundColor = new BackgroundColor(this.game, "#141d27")
     this.backgroundParticles = []
@@ -638,18 +636,22 @@ class Background {
     
     this.backgroundColor.update(deltaTime)
     this.backgroundLayers.forEach(layer => layer.update(deltaTime))
+
     this.backgroundParticles.forEach(particle => {
       particle.update(deltaTime)
       if(particle.markedForDeletion) this.backgroundParticles.splice(this.backgroundParticles.indexOf(particle), 1)
     })
+
     this.layers.forEach(layer => {
       layer.update(deltaTime)
       if (layer.markedForDeletion) this.layers.splice(this.layers.indexOf(layer), 1)
     })
+
     this.foregroundLayers.forEach(layer => {
       layer.update(deltaTime)
       if (layer.markedForDeletion) this.foregroundLayers.splice(this.foregroundLayers.indexOf(layer), 1)
     })
+
     this.planetTimer += deltaTime
     this.starTimer+= deltaTime
     this.galaxyTimer+= deltaTime
@@ -659,14 +661,14 @@ class Background {
     
     if(this.blackholeTimer > this.blackholeInterval) {
       let size = randomInt(200, 50)
-      let distance = randomInt(50000, 10000)
+      let distance = randomInt(50000, 20000)
       console.log("spawn blackhole")
       this.backgroundLayers.unshift(new Layer(this.game, this.blackholeSprites[randomInt(this.blackholeSprites.length - 1, 0)], size/distance + 0.0001, size, size))
       this.blackholeTimer = 0
     }
     if(this.galaxyTimer > this.galaxyInterval) {
       let size = randomInt(400, 200)
-      let distance = randomInt(40000, 20000)
+      let distance = randomInt(70000, 45000)
       console.log("spawn galaxy")
       this.backgroundLayers.unshift(new Layer(this.game, this.galaxySprites[randomInt(this.galaxySprites.length - 1, 0)], size/distance, size, size))
       this.galaxyTimer = 0
@@ -690,7 +692,11 @@ class Background {
       let distance = randomInt(1000, 100)
       console.log("spawn asteroid")
       if(Math.random() < 0.25) this.foregroundLayers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
-      else this.layers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
+      else {
+        distance = randomInt(400, 100)
+        size = randomInt(200, 100)
+        this.layers.push(new Layer(this.game, this.asteroidSprites[randomInt(this.asteroidSprites.length - 1, 0)], size/distance, size, size))
+      }
       this.asteroidTimer = 0
       console.log(this.foregroundLayers)
     }

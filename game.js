@@ -458,8 +458,6 @@ class BouncingProjectile extends Projectile {
 
 }
 
-
-
 class Particle {
   constructor(game, x, y, width, height, speedX, speedY, color, lifeTime) {
     this.game = game
@@ -590,9 +588,9 @@ class Background {
     this.planetTimer = 30000
     this.planetInterval = 35000
     this.starTimer = randomInt(400000, 0)
-    this.starInterval = 100000
+    this.starInterval = 140000
     this.galaxyTimer = randomInt(900000, 0)
-    this.galaxyInterval = 100000
+    this.galaxyInterval = 80000
     this.asteroidTimer = 0
     this.asteroidInterval = 5000
     this.blackholeTimer = 0

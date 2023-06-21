@@ -294,6 +294,7 @@ class Enemy {
     this.dropchance = 0.1
     this.markedForDeletion = false
     this.score = 20
+    this.sprite = enemyShipSprite
   }
   
   update(deltaTime) {
@@ -311,6 +312,7 @@ class Enemy {
       ctx.fillStyle = "red"
       ctx.fillRect(this.x, this.y, this.width, this.height)
     }
+    ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height)
   }
 
   shoot() {
@@ -346,17 +348,14 @@ class Ship extends Enemy {
     this.health = randomInt(125,75)
     this.dropchance = 0.2  
     this.score = 20
+    this.sprite = enemyShipSprite
   }
 
-  draw(ctx) {
-    super.draw(ctx)
-    ctx.drawImage(enemyShipSprite, this.x, this.y, this.width, this.height)
-  }
 }
 
 class Speeder extends Enemy {
-  constructor(game, shooting) {
-    super(game, shooting)
+  constructor(game) {
+    super(game, true)
     this.height = 100
     this.width = 200
     this.speedMultiplier = (Math.random() + 0.35) * 3
@@ -366,12 +365,9 @@ class Speeder extends Enemy {
     this.health = randomInt(50,25)
     this.dropchance = 0.5
     this.score = 40
+    this.sprite = enemySpeederSprite
   }
 
-  draw(ctx) {
-    super.draw(ctx)
-    ctx.drawImage(enemySpeederSprite, this.x, this.y, this.width, this.height)
-  }
 }
 
 
@@ -387,11 +383,30 @@ class Tank extends Enemy {
     this.health = randomInt(250,150)
     this.dropchance = 0.35
     this.score = 30
+    this.sprite = enemyTankSprite
   }
-  draw(ctx) {
-    super.draw(ctx)
-    ctx.drawImage(enemyTankSprite, this.x, this.y, this.width, this.height)
+
+}
+
+class Boss extends Enemy {
+  constructor(game, shooting) {
+    super(game, shooting)
+    this.height = 500
+    this.width = 500
+    this.speedMultiplier = Math.random() + 0.01
+    this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
+    this.projectileDamage = randomInt(100,75)
+    this.collisionDamage = randomInt(150,100)
+    this.health = randomInt(500,250)
+    this.dropchance = 0.5
+    this.score = 100
+    this.sprite = enemyBossSprite
   }
+
+  //update(deltaTime) {}
+
+  //draw(ctx) {}
+
 }
 
 
@@ -574,8 +589,9 @@ class Background {
     this.foregroundLayers = []
     this.backgroundColor = new BackgroundColor(this.game, "#141d27")
     this.backgroundParticles = []
-    this.planetInterval = 25000
-    this.starTimer = randomInt(900000, 0)
+    this.planetTimer = 30000
+    this.planetInterval = 35000
+    this.starTimer = randomInt(400000, 0)
     this.starInterval = 100000
     this.galaxyTimer = randomInt(900000, 0)
     this.galaxyInterval = 100000
@@ -634,7 +650,11 @@ class Background {
       layer.update(deltaTime)
       if (layer.markedForDeletion) this.foregroundLayers.splice(this.foregroundLayers.indexOf(layer), 1)
     })
-    this.planetTimer += deltaTime, this.starTimer+= deltaTime, this.galaxyTimer+= deltaTime, this.asteroidTimer+= deltaTime, this.blackholeTimer += deltaTime
+    this.planetTimer += deltaTime
+    this.starTimer+= deltaTime
+    this.galaxyTimer+= deltaTime
+    this.asteroidTimer+= deltaTime
+    this.blackholeTimer += deltaTime
 
     
     if(this.blackholeTimer > this.blackholeInterval) {

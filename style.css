@@ -240,7 +240,15 @@ main {
 
 #game {
     visibility: show;
+    image-rendering: optimizeSpeed;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
 }
+
 #qr-code {
     height: 100vh; 
     width: 100%;

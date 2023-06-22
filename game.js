@@ -3,7 +3,9 @@ import "/style.css"
 const canvas = document.querySelector("#game")
 const ctx = canvas.getContext("2d")
 
-ctx.imageSmoothingEnabled = false
+ctx.webkitImageSmoothingEnabled = false;
+ctx.mozImageSmoothingEnabled = false;
+ctx.imageSmoothingEnabled = false;
 
 canvas.width = 1700
 canvas.height = 1300
@@ -182,8 +184,8 @@ class InputHandler {
 class Player {
   constructor(game) {
     this.game = game
-    this.height = 120
-    this.width = 190
+    this.height = 160
+    this.width = 160
     this.x = 130
     this.y = 550
     this.padding = 50
@@ -287,7 +289,7 @@ class Enemy {
     this.shotTimer = 1000
     this.shotInterval = randomInt(1000,250) // in ms
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.35
-    this.projectileWidth = 70
+    this.projectileWidth = 100
     this.projectileHeight = 30
     this.damage = randomInt(30,15)
     this.health = randomInt(200,50)
@@ -339,8 +341,8 @@ class Enemy {
 class Ship extends Enemy {
   constructor(game, shooting) {
     super(game, shooting)
-    this.height = 190
-    this.width = 120
+    this.height = 160
+    this.width = 160
     this.speedMultiplier = Math.random() * 2 + 0.15
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
     this.projectileDamage = randomInt(30,15)
@@ -357,7 +359,7 @@ class Speeder extends Enemy {
   constructor(game) {
     super(game, true)
     this.height = 100
-    this.width = 200
+    this.width = 160
     this.speedMultiplier = (Math.random() + 0.35) * 3
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
     this.projectileDamage = randomInt(20,10)
@@ -374,8 +376,8 @@ class Speeder extends Enemy {
 class Tank extends Enemy {
   constructor(game, shooting) {
     super(game, shooting)
-    this.height = 250
-    this.width = 250
+    this.height = 256
+    this.width = 256
     this.speedMultiplier = Math.random() + 0.01
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
     this.projectileDamage = randomInt(75,50)
@@ -599,8 +601,6 @@ class BackgroundColor extends SparklingLayer {
 
 }
 
-
-
 class Background {
   constructor(game) {
     this.game = game
@@ -800,7 +800,7 @@ class Powerup {
 class InvincibilityPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "gold")
-    this.duration = 2500
+    this.duration = 3500
     this.name = "Invincibility"
     this.sprite = powerupInvincibleSprite
   }
@@ -818,7 +818,7 @@ class InvincibilityPowerup extends Powerup {
 class AmmoPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "turquoise")
-    this.duration = 5000
+    this.duration = 7500
     this.name = "Unlimited Ammo"
     this.sprite = powerupAmmoSprite
   }
@@ -889,7 +889,7 @@ class HealthPowerup extends Powerup {
 class BulletPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "green")
-    this.duration = 3500
+    this.duration = 5500
     this.name = "Bouncing Bullets"
     this.sprite = powerupBulletSprite
   }
@@ -980,10 +980,18 @@ class IngameUI extends UI {
   }
   draw(ctx) {
     super.draw(ctx)
-    ctx.fillText("Health: " + Math.ceil(game.player.health), 50, 100)
+    ctx.fillText("Health: " + Math.ceil(this.game.player.health), 50, 100)
     ctx.fillText("Ammo: " + game.player.currentAmmo, 50, 200)
-    ctx.fillText("Time: " + Math.round(game.gameTime/1000) + "s", 1150, 100)
-    ctx.fillText("Score: " + game.score, 1150, 200)
+    ctx.fillText("Time: " + Math.round(this.game.gameTime/1000) + "s", 1150, 100)
+    ctx.fillText("Score: " + this.game.score, 1150, 200)
+    for(let i = 0; i < this.game.player.currentAmmo; i++) {
+      ctx.fillStyle = "lightblue"
+      ctx.fillRect(50 + i*20, 300, 20, 20)
+    }
+    for(let i = 0; i < this.game.player.health; i++) {
+      ctx.fillStyle = "red"
+      ctx.fillRect(50 + i*5, 250, 5, 20)
+    }
   }
 }
 

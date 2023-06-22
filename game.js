@@ -496,6 +496,20 @@ class Particle {
   }
 }
 
+class Explosion extends Particle {
+  constructor(game, x, y, width, height, speedX, speedY, lifeTime) {
+    super(game, x, y, width, height, speedX, speedY, null, lifeTime)
+  }
+
+  update(deltaTime) {
+    if (this.lifeTime <= 0) this.markedForDeletion = true
+    else this.lifeTime -= deltaTime
+  }
+
+  draw(ctx) {
+    ctx.drawImage(explosionSprite, this.x, this.y, this.width, this.height)
+  }
+}
 class Layer {
   constructor(game, sprite, speedMultiplier, width, height, sparkling = false, sparkleInterval = 500, sparkleSize = 5, sparkleColor = "white" ) {
     this.game = game  

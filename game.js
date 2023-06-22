@@ -161,7 +161,7 @@ window.addEventListener("load", function () {
 class InputHandler {
   constructor(game) {
     this.game = game
-    this.acceptedInputs = ["arrowup", "arrowdown", "arrowleft", "arrowright","w","a","s","d", " ", "e", "q", "f", "x", "enter"]
+    this.acceptedInputs = ["arrowup", "arrowdown", "arrowleft", "arrowright","w","a","s","d", " ", "e", "q", "f", "x", "enter", "1", "2"]
 
     window.addEventListener("keydown", event => {
       if ((this.acceptedInputs.includes(event.key.toLowerCase())) && !(this.game.currentInputs.includes(event.key.toLowerCase()))) {
@@ -249,10 +249,10 @@ class Player {
   shoot() {
     if (this.currentAmmo > 0 && this.shotTimer >= this.shotInterval) {
       if(this.unlimitedAmmo == false) this.currentAmmo --
-      this.game.playerProjectiles.push(new Projectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, true))
+      this.game.playerProjectiles.push(new Projectile(this.game, playerProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, true))
       if(this.bouncingBullets == true) {
-        this.game.playerProjectiles.push(new BouncingProjectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed, true))
-        this.game.playerProjectiles.push(new BouncingProjectile(this.game, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed * -1, true))
+        this.game.playerProjectiles.push(new BouncingProjectile(this.game, playerProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed, true))
+        this.game.playerProjectiles.push(new BouncingProjectile(this.game, playerProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed * -1, true))
       } 
       this.shotTimer = 0
     }
@@ -317,7 +317,7 @@ class Enemy {
 
   shoot() {
     if(this.shooting && this.ammo > 0) {
-      this.game.enemyProjectiles.push(new Projectile(this.game, this.x - this.projectileWidth - 0.1, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage))
+      this.game.enemyProjectiles.push(new Projectile(this.game, enemyProjectileSprite, this.x - this.projectileWidth - 0.1, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage))
       this.ammo --
     }
   }
@@ -411,16 +411,17 @@ class Boss extends Enemy {
 
 
 class Projectile {
-  constructor(game, x, y, width, height, speed, damage, playerProjectile = false) {
+  constructor(game, sprite, x, y, width, height, speed, damage, playerProjectile = false) {
     this.game = game
+    this.sprite = sprite
     this.x = x
     this.y = y
     this.width = width
     this.height = height
     this.speedX = speed
     this.damage = damage
-    this.speedY  = this.game.player.shotSpeed
     this.playerProjectile = playerProjectile
+    this.projectileType = "normal"
     this.markedForDeletion = false
   }
 
@@ -435,25 +436,35 @@ class Projectile {
       ctx.fillRect(this.x, this.y, this.width, this.height)
     } 
     if(this.playerProjectile) {
-      ctx.drawImage(playerProjectileSprite, this.x, this.y, this.width, this.height)
+      ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height)
     }
     else {
-      ctx.drawImage(enemyProjectileSprite, this.x, this.y, this.width, this.height)
+      ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height)
     }
   }
 }
 
 class BouncingProjectile extends Projectile {
-  constructor(game, x, y, width, height, speed, damage, speedY, playerProjectile = false) {
-    super(game, x, y, width, height, speed, damage, playerProjectile)
-    this.padding = 50
+  constructor(game, sprite, x, y, width, height, speed, damage, speedY, playerProjectile = false) {
+    super(game, sprite, x, y, width, height, speed, damage, playerProjectile)
     this.speedY = speedY
+    this.projectileType = "bouncing"
+    this.padding = 50
   }
 
   update(deltaTime) {
     super.update(deltaTime)
     this.y += this.speedY * deltaTime
     if (this.y + this.height + this.padding > canvas.height || this.y < 0 + this.padding) this.speedY *= -1
+  }
+
+}
+
+class ExpleosveProjectile extends Projectile {
+  constructor(game, sprite, x, y, width, height, speed, damage, explosionRadius, playerProjectile = false) {
+    super(game, sprite, x, y, width, height, speed, damage, playerProjectile)
+    this.explosionRadius = explosionRadius
+    this.projectileType = "explosive"
   }
 
 }
@@ -665,14 +676,14 @@ class Background {
       this.blackholeTimer = 0
     }
     if(this.galaxyTimer > this.galaxyInterval) {
-      let size = randomInt(400, 200)
+      let size = randomInt(350, 200)
       let distance = randomInt(70000, 45000)
       console.log("spawn galaxy")
       this.backgroundLayers.unshift(new Layer(this.game, this.galaxySprites[randomInt(this.galaxySprites.length - 1, 0)], size/distance, size, size))
       this.galaxyTimer = 0
     }
     if(this.starTimer > this.starInterval) {
-      let size = randomInt(500, 300)
+      let size = randomInt(400, 250)
       let distance = randomInt(15000, 10000)
       console.log("spawn star")
       this.layers.unshift(new Layer(this.game, this.starSprites[randomInt(this.starSprites.length - 1, 0)], size/distance, size, size))
@@ -732,8 +743,8 @@ class Powerup {
       this.x += this.speed * deltaTime
       if (this.x + this.width < 0 || this.x - this.width > 1700 ) this.markedForDeletion = true
     }
-    if(this.game.currentInputs.includes("e") && this.pickedUp == true && this.activated != true && this.slot == 2) this.startEffect()
-    else if(this.game.currentInputs.includes("q") && this.pickedUp == true && this.activated != true && this.slot == 1) this.startEffect()
+    if(this.game.currentInputs.includes("2") && this.pickedUp == true && this.activated != true && this.slot == 2) this.startEffect()
+    else if(this.game.currentInputs.includes("1") && this.pickedUp == true && this.activated != true && this.slot == 1) this.startEffect()
     if(this.activated == true) {
       this.durationTimer += deltaTime
       if (this.durationTimer >= this.duration){
@@ -1017,6 +1028,7 @@ class Game {
     this.powerups = []
     this.collectedPowerups = []
     this.player.unlimitedAmmo = true
+    this.spawnEnemies = true
 
   }
   update(deltaTime) {
@@ -1037,16 +1049,19 @@ class Game {
       projectile.update(deltaTime)
       this.enemies.forEach(enemy => {
         if (this.checkCollision(projectile, enemy)) {
-          projectile.markedForDeletion = true
-          enemy.takeDamage(projectile.damage)
+          if(projectile.type == "explosive") projectile.explode()
+          else {
+            projectile.markedForDeletion = true
+            enemy.takeDamage(projectile.damage)
           }
+        }
         })
       if (projectile.markedForDeletion) {
         this.playerProjectiles.splice(this.playerProjectiles.indexOf(projectile), 1)
       }
     })
 
-    if(this.currentInputs.includes("x")) this.background.asteroidTimer += 50000//this.powerups.push(this.randomPowerup(this, 1700, randomInt(1700,0), 100, 100))
+    if(this.currentInputs.includes("x")) this.powerups.push(this.randomPowerup(this, 1700, randomInt(1700,0), 100, 100))//this.background.asteroidTimer += 50000
 
 
     // menu specific
@@ -1065,7 +1080,7 @@ class Game {
   
       //enemies
       this.enemySpawnTimer += deltaTime * this.spawnAcceleration
-      if (this.enemySpawnTimer >= this.enemySpawnInterval) {
+      if (this.enemySpawnTimer >= this.enemySpawnInterval && this.spawnEnemies) {
         this.enemies.push(this.randomEnemy(this, chance(0.3)))
         this.enemySpawnTimer = 0
       }

@@ -460,7 +460,7 @@ class BouncingProjectile extends Projectile {
 
 }
 
-class ExpleosveProjectile extends Projectile {
+class ExplosiveProjectile extends Projectile {
   constructor(game, sprite, x, y, width, height, speed, damage, explosionRadius, playerProjectile = false) {
     super(game, sprite, x, y, width, height, speed, damage, playerProjectile)
     this.explosionRadius = explosionRadius

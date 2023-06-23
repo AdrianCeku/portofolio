@@ -44,11 +44,20 @@ enemyBossSprite.src = "assets/game/enemy_boss.png"
 const playerProjectileSprite = new Image()
 playerProjectileSprite.src = "assets/game/player_projectile.png"
 
+const playerExplosiveProjectileSprite = new Image()
+playerExplosiveProjectileSprite.src = "assets/game/player_explosive_projectile.png"
+
 const enemyProjectileSprite = new Image()
 enemyProjectileSprite.src = "assets/game/enemy_projectile.png"
 
+const enemyExplosiveProjectileSprite = new Image()
+enemyExplosiveProjectileSprite.src = "assets/game/enemy_explosive_projectile.png"
+
 const powerupInvincibleSprite = new Image()
 powerupInvincibleSprite.src = "assets/game/powerup_invincible.png"
+
+const shieldSprite = new Image()
+shieldSprite.src = "assets/game/shield.png"
 
 const powerupBulletSprite = new Image()
 powerupBulletSprite.src = "assets/game/powerup_bullets.png"
@@ -64,6 +73,9 @@ powerupDamageSprite.src = "assets/game/powerup_damage.png"
 
 const powerupSpeedSprite = new Image()
 powerupSpeedSprite.src = "assets/game/powerup_speed.png"
+
+const powerupExplosiveSprite = new Image()
+powerupExplosiveSprite.src = "assets/game/powerup_explosive.png"
 
 const alienPlanet1Sprite = new Image()
 alienPlanet1Sprite.src = "assets/game/alien_planet_1.png"
@@ -158,6 +170,18 @@ asteroid10Sprite.src = "assets/game/asteroid_10.png"
 const cloudsSprite = new Image()
 cloudsSprite.src = "assets/game/bg_clouds.png"
 
+const explosion1Sprite = new Image()
+explosion1Sprite.src = "assets/game/exp1.png"
+
+const explosion2Sprite = new Image()
+explosion2Sprite.src = "assets/game/exp2.png"
+
+const explosion3Sprite = new Image()
+explosion3Sprite.src = "assets/game/exp3.png"
+
+const explosion4Sprite = new Image()
+explosion4Sprite.src = "assets/game/exp4.png"
+
 
 window.addEventListener("load", function () {
 class InputHandler {
@@ -194,18 +218,22 @@ class Player {
     this.speedMultiplier = 1.3
     this.shotTimer = 0
     this.shotInterval = 100 // in ms
-    this.maxAmmo = 25
-    this.currentAmmo = 25
+    this.maxAmmo = 30
+    this.currentAmmo = 30
     this.unlimitedAmmo = false
     this.ammoTimer = 0
-    this.ammoInterval = 400 // in ms
+    this.ammoInterval = 350 // in ms
+    this.explosiveAmmo = 5
     this.shotSpeed = 3
     this.projectileWidth = 100
     this.projectileHeight = 30
     this.damage = 25
-    this.health = 100
-    this.invincible = true
+    this.maxHealth = 200
+    this.health = 200
+    this.invincible = false
     this.bouncingBullets = false
+    this.explosiveBullets = false
+    this.timeSinceLastHit = 0
   }
 
   update(deltaTime) {
@@ -238,6 +266,7 @@ class Player {
     }
     if(this.shotTimer < this.shotInterval) this.shotTimer += deltaTime 
 
+    this.timeSinceLastHit += deltaTime
   }
 
   draw(ctx) {
@@ -246,12 +275,37 @@ class Player {
       ctx.fillRect(this.x, this.y, this.width, this.height)
     }
     ctx.drawImage(playerSprite, this.x, this.y, this.width, this.height)
+
+    //hp bar
+
+    if (this.game.gameState == "ingame") {
+      if(this.timeSinceLastHit < 1000) {
+        ctx.fillStyle = "lightblue"
+        ctx.fillRect(this.x, this.y - 30, this.width * (this.health / this.maxHealth), 10)
+      }
+      
+      if(this.currentAmmo < this.maxAmmo) {
+        ctx.fillStyle = "orange"
+        ctx.fillRect(this.x, this.y + this.height + 10, this.width * (this.currentAmmo / this.maxAmmo), 10)
+
+        /*
+        let size = this.width/10
+        for(let i = 0; i < this.currentAmmo; i++) {
+          ctx.fillStyle = "orange"
+          if(i <= 9) ctx.fillRect(this.x + i*size*1.2, this.y + 180, size, size)
+          else if(i <= 19) ctx.fillRect(this.x + (i-10)*size*1.2, this.y + 200, size, size)
+          else ctx.fillRect(this.x + (i-20)*size*1.2, this.y + 220, size, size)
+        }
+        */
+      }
+    }
   }
 
   shoot() {
     if (this.currentAmmo > 0 && this.shotTimer >= this.shotInterval) {
-      if(this.unlimitedAmmo == false) this.currentAmmo --
-      this.game.playerProjectiles.push(new Projectile(this.game, playerProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, true))
+      if(this.unlimitedAmmo == false) this.currentAmmo -- 
+      if(this.explosiveBullets) this.game.playerProjectiles.push(new ExplosiveProjectile(this.game, playerExplosiveProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage * 3, 500, true))
+      else this.game.playerProjectiles.push(new Projectile(this.game, playerProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, true))
       if(this.bouncingBullets == true) {
         this.game.playerProjectiles.push(new BouncingProjectile(this.game, playerProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed, true))
         this.game.playerProjectiles.push(new BouncingProjectile(this.game, playerProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed * -1, true))
@@ -261,7 +315,10 @@ class Player {
   }
 
   takeDamage(damage) {
-  if(this.invincible == false) this.health -= damage
+  if(this.invincible == false) {
+    this.health -= damage
+    this.timeSinceLastHit = 0
+  }
   if(this.health <= 0 && this.game.gameState == "ingame") {
     this.game.gameState = "gameover"
     this.game.endTime = this.game.gameTime
@@ -276,13 +333,14 @@ class Player {
 }
 
 class Enemy {
-  constructor(game, shooting) {
+  constructor(game, shooting, hp = randomInt(200,50), projectileDamage = 25, collisionDamage = 50) {
     this.game = game
     this.height = 190
     this.width = 120
     this.x = 1700
     this.y = randomInt(canvas.height - this.height-50, 0)
     this.speedX = -1
+    this.speedY = 0
     this.speedMultiplier = Math.random() * 2 + 0.1
     this.shooting = shooting
     this.ammo = randomInt(10,3)
@@ -291,16 +349,20 @@ class Enemy {
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.35
     this.projectileWidth = 100
     this.projectileHeight = 30
-    this.damage = randomInt(30,15)
-    this.health = randomInt(200,50)
+    this.projectileDamage = projectileDamage
+    this.collisionDamage = collisionDamage
+    this.health = hp
+    this.maxHealth = hp
     this.dropchance = 0.1
     this.markedForDeletion = false
     this.score = 20
     this.sprite = enemyShipSprite
+    this.boss = false
   }
   
   update(deltaTime) {
     this.x += this.speedX * this.speedMultiplier * deltaTime
+    this.y += this.speedY * this.speedMultiplier * deltaTime
     if (this.x + this.width < 0) this.markedForDeletion = true
     this.shotTimer += deltaTime
     if (this.shotTimer >= this.shotInterval) {
@@ -315,6 +377,10 @@ class Enemy {
       ctx.fillRect(this.x, this.y, this.width, this.height)
     }
     ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height)
+    
+    //hp bar
+    ctx.fillStyle = "red"
+    ctx.fillRect(this.x, this.y - 30, this.width * (this.health / this.maxHealth), 10)
   }
 
   shoot() {
@@ -339,34 +405,28 @@ class Enemy {
 }
 
 class Ship extends Enemy {
-  constructor(game, shooting) {
-    super(game, shooting)
+  constructor(game, shooting, hp = randomInt(125,75), projectileDamage = 25, collisionDamage = 50) {
+    super(game, shooting, hp, projectileDamage, collisionDamage)
     this.height = 160
     this.width = 160
     this.speedMultiplier = Math.random() * 2 + 0.15
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
-    this.projectileDamage = randomInt(30,15)
-    this.collisionDamage = randomInt(45,35)
-    this.health = randomInt(125,75)
     this.dropchance = 0.2  
-    this.score = 20
+    this.score = 25
     this.sprite = enemyShipSprite
   }
 
 }
 
 class Speeder extends Enemy {
-  constructor(game) {
-    super(game, true)
+  constructor(game, hp = randomInt(50,25), projectileDamage = 15, collisionDamage = 25) {
+    super(game, true, hp, projectileDamage, collisionDamage)
     this.height = 100
     this.width = 160
     this.speedMultiplier = (Math.random() + 0.35) * 3
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
-    this.projectileDamage = randomInt(20,10)
-    this.collisionDamage = randomInt(30,15)
-    this.health = randomInt(50,25)
     this.dropchance = 0.5
-    this.score = 40
+    this.score = 45
     this.sprite = enemySpeederSprite
   }
 
@@ -374,40 +434,42 @@ class Speeder extends Enemy {
 
 
 class Tank extends Enemy {
-  constructor(game, shooting) {
-    super(game, shooting)
+  constructor(game, shooting, hp = randomInt(250,150),  projectileDamage = 35, collisionDamage = 75) {
+    super(game, shooting, hp, projectileDamage, collisionDamage)
     this.height = 256
     this.width = 256
     this.speedMultiplier = Math.random() + 0.01
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
-    this.projectileDamage = randomInt(75,50)
-    this.collisionDamage = randomInt(99,75)
-    this.health = randomInt(250,150)
     this.dropchance = 0.35
-    this.score = 30
+    this.score = 35
     this.sprite = enemyTankSprite
   }
 
 }
 
 class Boss extends Enemy {
-  constructor(game, shooting) {
-    super(game, shooting)
+  constructor(game, shooting, projectileDamage = 50, collisionDamage = 100) {
+    super(game, shooting, projectileDamage, collisionDamage)
     this.height = 500
     this.width = 500
     this.speedMultiplier = Math.random() + 0.01
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
-    this.projectileDamage = randomInt(100,75)
-    this.collisionDamage = randomInt(150,100)
     this.health = randomInt(500,250)
     this.dropchance = 0.5
-    this.score = 100
+    this.score = 250
     this.sprite = enemyBossSprite
+    this.boss = true
+    this.phase = 0
   }
 
-  //update(deltaTime) {}
+  update(deltaTime) {
+    this.x += this.speedX * this.speedMultiplier * deltaTime
+    this.y += this.speedY * this.speedMultiplier * deltaTime
+  }    
 
-  //draw(ctx) {}
+  draw(ctx) {
+    	super.draw(ctx)
+  }
 
 }
 
@@ -423,7 +485,6 @@ class Projectile {
     this.speedX = speed
     this.damage = damage
     this.playerProjectile = playerProjectile
-    this.projectileType = "normal"
     this.markedForDeletion = false
   }
 
@@ -444,13 +505,18 @@ class Projectile {
       ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height)
     }
   }
+
+  onHit(target) {
+    target.takeDamage(this.damage)
+    this.game.particles.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, 70, 70, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, 0, target, false, 200))
+    this.markedForDeletion = true
+  }
 }
 
 class BouncingProjectile extends Projectile {
   constructor(game, sprite, x, y, width, height, speed, damage, speedY, playerProjectile = false) {
     super(game, sprite, x, y, width, height, speed, damage, playerProjectile)
     this.speedY = speedY
-    this.projectileType = "bouncing"
     this.padding = 50
   }
 
@@ -463,12 +529,18 @@ class BouncingProjectile extends Projectile {
 }
 
 class ExplosiveProjectile extends Projectile {
-  constructor(game, sprite, x, y, width, height, speed, damage, explosionRadius, playerProjectile = false) {
+  constructor(game, sprite, x, y, width, height, speed, damage, explosionSize, playerProjectile = false) {
     super(game, sprite, x, y, width, height, speed, damage, playerProjectile)
-    this.explosionRadius = explosionRadius
-    this.projectileType = "explosive"
+    this.explosionSize = explosionSize
   }
 
+  onHit(target) {
+    target.takeDamage(this.damage)
+    console.log("explosion")
+    if(this.playerProjectile) this.game.playerExplosions.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, this.explosionSize, this.explosionSize, 0, 0, this.damage, target, true, 500))
+    else this.game.enemyExplosions.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, this.explosionSize, this.explosionSize, 0, 0, this.damage, target, false, 500))
+    this.markedForDeletion = true
+  }
 }
 
 class Particle {
@@ -499,19 +571,37 @@ class Particle {
 }
 
 class Explosion extends Particle {
-  constructor(game, x, y, width, height, speedX, speedY, lifeTime) {
+  constructor(game, x, y, width, height, speedX, speedY, damage, hitTarget, playerExplosion = false, lifeTime=500) {
     super(game, x, y, width, height, speedX, speedY, null, lifeTime)
-  }
-
-  update(deltaTime) {
-    if (this.lifeTime <= 0) this.markedForDeletion = true
-    else this.lifeTime -= deltaTime
+    this.damage = damage
+    this.playerExplosion = playerExplosion
+    this.targetsHit = [hitTarget]
+    this.frameInterval = lifeTime / 4
+    this.x = this.x - this.width/2
+    this.y = this.y - this.height/2
   }
 
   draw(ctx) {
-    ctx.drawImage(explosionSprite, this.x, this.y, this.width, this.height)
+    if(this.game.currentInputs.includes("f")) {
+      ctx.fillStyle = "orange"
+      ctx.fillRect(this.x, this.y, this.width, this.height)
+    }
+    if (this.lifeTime >= this.frameInterval*3) ctx.drawImage(explosion1Sprite, this.x, this.y, this.width, this.height)
+    else if (this.lifeTime >= this.frameInterval*2) ctx.drawImage(explosion2Sprite, this.x, this.y, this.width, this.height)
+    else if (this.lifeTime >= this.frameInterval*1) ctx.drawImage(explosion3Sprite, this.x, this.y, this.width, this.height)
+    else ctx.drawImage(explosion4Sprite, this.x, this.y, this.width, this.height)
+  }
+
+  onContact(target) {
+    if (!this.targetsHit.includes(target)) {
+      target.takeDamage(this.damage)
+      this.targetsHit.push(target)
+      console.log("explosion damage")
+    }
   }
 }
+
+
 class Layer {
   constructor(game, sprite, speedMultiplier, width, height, sparkling = false, sparkleInterval = 500, sparkleSize = 5, sparkleColor = "white" ) {
     this.game = game  
@@ -800,11 +890,49 @@ class Powerup {
 class InvincibilityPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "gold")
-    this.duration = 3500
+    this.duration = 4500
     this.name = "Invincibility"
     this.sprite = powerupInvincibleSprite
+    this.shield = {
+      x : this.game.player.x + this.game.player.width,
+      y : this.game.player.y - 25,
+      width : this.game.player.width/8*2,
+      height : this.game.player.height+50
+    }
   }
 
+  update(deltaTime) {
+    super.update(deltaTime)
+    if(this.activated == true) {
+      this.shield = {
+        x : this.game.player.x + this.game.player.width,
+        y : this.game.player.y - 25,
+        width : this.game.player.width/8*2,
+        height : this.game.player.height+50
+      }
+      this.game.enemies.forEach(enemy => {
+        if(this.game.checkCollision(this.shield, enemy)) {
+          if (!enemy.boss) enemy.markedForDeletion = true
+        }
+      })
+      this.game.enemyProjectiles.forEach(projectile => {
+        if(this.game.checkCollision(this.shield, projectile)) {
+          projectile.markedForDeletion = true
+        }
+      })
+    }
+  }
+
+  draw(ctx) {
+    super.draw(ctx)
+    if(this.activated) {
+      ctx.drawImage(shieldSprite, this.game.player.x + this.game.player.width, this.game.player.y - 25, this.game.player.width/8*2, this.game.player.height+50)
+      if(this.game.currentInputs.includes("f")) {
+        ctx.fillStyle = "white"
+        ctx.fillRect(this.shield.x, this.shield.y, this.shield.width, this.shield.height)
+      }
+    }
+  }
   startEffect() {
     super.startEffect()
     this.game.player.invincible = true
@@ -837,7 +965,7 @@ class AmmoPowerup extends Powerup {
 class DamagePowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "red")
-    this.duration = 7500
+    this.duration = 10000
     this.name = "Double Damage"
     this.sprite = powerupDamageSprite
   }
@@ -856,7 +984,7 @@ class DamagePowerup extends Powerup {
 class SpeedPowerup extends Powerup {
   constructor(game, x, y, width, height) {
     super(game, x, y, width, height, "blue")
-    this.duration = 12000
+    this.duration = 15000
     this.name = "Speed Boost"
     this.sprite = powerupSpeedSprite
   }
@@ -904,6 +1032,26 @@ class BulletPowerup extends Powerup {
     this.game.player.bouncingBullets = false
   }
 }
+
+class ExplosivePowerup extends Powerup {
+  constructor(game, x, y, width, height) {
+    super(game, x, y, width, height, "orange")
+    this.duration = 5500
+    this.name = "Explosive Bullets"
+    this.sprite = powerupExplosiveSprite
+  }
+
+  startEffect() {
+    super.startEffect()
+    this.game.player.explosiveBullets = true
+  }
+
+  endEffect() {
+    super.endEffect()
+    this.game.player.explosiveBullets = false
+  }
+}
+
 
 
 class UI {
@@ -984,14 +1132,17 @@ class IngameUI extends UI {
     ctx.fillText("Ammo: " + game.player.currentAmmo, 50, 200)
     ctx.fillText("Time: " + Math.round(this.game.gameTime/1000) + "s", 1150, 100)
     ctx.fillText("Score: " + this.game.score, 1150, 200)
-    for(let i = 0; i < this.game.player.currentAmmo; i++) {
+    /*for(let i = 0; i < this.game.player.currentAmmo; i++) {
       ctx.fillStyle = "lightblue"
       ctx.fillRect(50 + i*20, 300, 20, 20)
     }
-    for(let i = 0; i < this.game.player.health; i++) {
+    
+     for(let i = 0; i < this.game.player.health; i++) {
       ctx.fillStyle = "red"
       ctx.fillRect(50 + i*5, 250, 5, 20)
     }
+    */
+   
   }
 }
 
@@ -1040,6 +1191,8 @@ class Game {
     this.currentInputs = []
     this.playerProjectiles = []
     this.particles = []
+    this.playerExplosions = []
+    this.enemyExplosions = []
     this.enemySpawnTimer = 0
     this.enemySpawnInterval = 2000 // startvalue, only in ms if spawnAcceleration is 1
     this.spawnAcceleration = 1
@@ -1065,25 +1218,47 @@ class Game {
         this.particles.splice(this.particles.indexOf(particle), 1)
       }
     })
+    
+    //player explosions
+    this.playerExplosions.forEach(explosion => {
+      explosion.update(deltaTime)
+      this.enemies.forEach(enemy => {
+        if (this.checkCollision(explosion, enemy)) {
+          explosion.onContact(enemy)
+          }
+        }
+      )
+      if (explosion.markedForDeletion) {
+        this.playerExplosions.splice(this.playerExplosions.indexOf(explosion), 1)
+      }
+    })
+    
+    //enemy explosions
+    this.enemyExplosions.forEach(explosion => {
+      explosion.update(deltaTime)
+        if (this.checkCollision(explosion, this.player)) {
+          explosion.onContact(this.player)
+          }
+      if (explosion.markedForDeletion) {
+        this.enemyExplosions.splice(this.enemyExplosions.indexOf(explosion), 1)
+      }
+    })
 
     // player projectiles
     this.playerProjectiles.forEach(projectile => {
       projectile.update(deltaTime)
       this.enemies.forEach(enemy => {
         if (this.checkCollision(projectile, enemy)) {
-          if(projectile.type == "explosive") projectile.explode()
-          else {
-            projectile.markedForDeletion = true
-            enemy.takeDamage(projectile.damage)
+            projectile.onHit(enemy)
           }
         }
-        })
+      )
       if (projectile.markedForDeletion) {
         this.playerProjectiles.splice(this.playerProjectiles.indexOf(projectile), 1)
       }
     })
 
-    if(this.currentInputs.includes("x")) this.powerups.push(this.randomPowerup(this, 1700, randomInt(1700,0), 100, 100))//this.background.asteroidTimer += 50000
+    if(this.currentInputs.includes("x"))  this.powerups.push(this.randomPowerup(this, 1700, randomInt(1700,0), 100, 100))//this.enemies.push(this.randomEnemy(this, chance(0.3))) //this.particles.push(new Explosion(this.game, 1700, randomInt(1300, 0), 50, 50, -1, 0, 500)) //this.background.asteroidTimer += 50000
 
 
     // menu specific
@@ -1165,9 +1340,6 @@ class Game {
   draw(ctx) {
     this.background.draw(ctx)
     
-    this.particles.forEach(particle => {
-      particle.draw(ctx)
-    })
     
     this.player.draw(ctx)
   
@@ -1186,6 +1358,18 @@ class Game {
     
     this.powerups.forEach(powerup => {
       powerup.draw(ctx)
+    })
+
+    this.particles.forEach(particle => {
+      particle.draw(ctx)
+    })
+
+    this.playerExplosions.forEach(explosion => {
+      explosion.draw(ctx)
+    })
+
+    this.enemyExplosions.forEach(explosion => {
+      explosion.draw(ctx)
     })
     
     this.collectedPowerups.forEach(powerup => {
@@ -1226,7 +1410,7 @@ class Game {
   }
 
   randomPowerup(game, x, y, width, height) {
-    let numberOfPowerups = 6
+    let numberOfPowerups = 7
     let random = Math.random()
     if (random < 1/numberOfPowerups) {
       return new InvincibilityPowerup(game, x, y, width, height)
@@ -1245,6 +1429,9 @@ class Game {
     }
     else if (random <= 6/numberOfPowerups) {
       return new BulletPowerup(game, x, y, width, height)
+    }
+    else if (random <= 7/numberOfPowerups) {
+      return new ExplosivePowerup(game, x, y, width, height)
     }
   }
 }

@@ -236,7 +236,7 @@ class Player {
     this.damage = 25
     this.maxHealth = 200
     this.health = 200
-    this.invincible = true
+    this.invincible = false
     this.bouncingBullets = false
     this.explosiveBullets = false
     this.timeSinceLastHit = 0
@@ -475,7 +475,7 @@ class Tank extends Enemy {
 }
 
 class Boss extends Enemy {
-  constructor(game, hp=1000, projectileDamage = 50, collisionDamage = 100) {
+  constructor(game, hp=2500, projectileDamage = 50, collisionDamage = 100) {
     super(game, false, hp, projectileDamage, collisionDamage)
     this.height = 500
     this.width = 500
@@ -491,7 +491,7 @@ class Boss extends Enemy {
     this.y = canvas.height / 2 - this.height / 2
     this.health = this.maxHealth * 1
     this.game.spawnEnemies = false
-    this.shotSpeed = -0.7
+    this.shotSpeed = -0.5
   }
 
   update(deltaTime) {
@@ -515,7 +515,10 @@ class Boss extends Enemy {
         this.shoot()
         this.shotTimer = 0
       }
-      if(this.health <= this.maxHealth * 0.75) this.phase = 2
+      if(this.health <= this.maxHealth * 0.75) {
+        this.phase = 2
+        this.shotInterval = 1500
+      }
     }
     else if(this.phase == 2) {
       if (this.shotTimer >= this.shotInterval) {
@@ -524,7 +527,7 @@ class Boss extends Enemy {
       }
       if(this.health <= this.maxHealth * 0.5) {
         this.phase = 3
-        this.shotInterval = 2000
+        this.shotInterval = 2500
       }
     }
     else if(this.phase == 3) {
@@ -534,7 +537,7 @@ class Boss extends Enemy {
       }
       if(this.health <= this.maxHealth * 0.30) {
         this.phase = 4
-        this.shotInterval = 1000
+        this.shotInterval = 1500
       }
     }
     else if(this.phase == 4) {
@@ -544,9 +547,9 @@ class Boss extends Enemy {
       }
       if(this.health <= this.maxHealth * 0.15) {
         this.phase = 5
-        this.shotInterval = 2000
+        this.shotInterval = 2500
 
-        this.shotspeed = -0.4
+        this.shotspeed = -0.2
       }
     }
     else if(this.phase == 5) {
@@ -579,7 +582,8 @@ class Boss extends Enemy {
   destory() {
     this.game.spawnEnemies = true
     this.markedForDeletion = true
-    game.score += this.score
+    this.game.score += this.score
+    if(this.game.player.health < 200) this.game.player.health = 200
     this.game.gameState = "levelup"
     this.game.enemies = []
     this.game.enemyProjectiles = []
@@ -1305,28 +1309,33 @@ class GameOverUI extends UI {
   }
 }
 
-class LevelUPUI extends UI {
+class LevelUpUI extends UI {
   constructor(game) {
     super(game)
+    this.fontSize = 100
   }
 
   update(deltaTime) {
     if(this.game.currentInputs.includes("1")){
-      //et upgrade 1 
+      //get upgrade 1
+      this.game.gameState = "ingame"
+      this.game.player.unlimitedAmmo = false
     }
     else if(this.game.currentInputs.includes("2")){
       //get upgrade 2
+      this.game.gameState = "ingame"
+      this.game.player.unlimitedAmmo = false
     }
     else if(this.game.currentInputs.includes("3")){
       //get upgrade 3
+      this.game.gameState = "ingame"
+      this.game.player.unlimitedAmmo = false
     }
   }
 
   draw(ctx) {
     super.draw(ctx)
-    ctx.fillText("Press 1 for upgrade 1", 250, 1100)
-    ctx.fillText("Press 2 for upgrade 2", 250, 1100)
-    ctx.fillText("Press 3 for upgrade 3", 250, 1100)
+    ctx.fillText("Choose your upgrade. Press 1-3", 300, 1100)
   }
 }
 
@@ -1343,7 +1352,7 @@ class Game {
     this.mainMenuUI = new MainMenuUI(this)
     this.ingameUI = new IngameUI(this)
     this.gameOverUI = new GameOverUI(this)
-    this.levelUpUI = new LevelUPUI(this)
+    this.levelUpUI = new LevelUpUI(this)
     this.background = new Background(this)
     this.currentInputs = []
     this.playerProjectiles = []
@@ -1355,14 +1364,15 @@ class Game {
     this.spawnAcceleration = 1
     this.spawnAccelerationTimer = 0
     this.spawnAccelerationInterval = 15000 // in ms
-    this.bossTimer = 600000
-    this.bossInterval = 600000 // in ms
+    this.bossTimer = 60000
+    this.bossInterval = 60000 // in ms
     this.enemies = []
     this.enemyProjectiles = []
     this.powerups = []
     this.collectedPowerups = []
     this.player.unlimitedAmmo = true
     this.spawnEnemies = true
+    this.gameState = "levelup"
 
   }
   update(deltaTime) {

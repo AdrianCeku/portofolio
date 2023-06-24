@@ -431,7 +431,7 @@ class Ship extends Enemy {
 }
 
 class Speeder extends Enemy {
-  constructor(game,hp = 60, projectileDamage = 15, collisionDamage = 25, dropchance = 0.5) {
+  constructor(game,hp = 60, projectileDamage = 15, collisionDamage = 25, dropchance = 0.1) {
     super(game, null, hp, projectileDamage, collisionDamage)
     this.height = 100
     this.width = 160
@@ -535,7 +535,7 @@ class Boss extends Enemy {
         this.shoot()
         this.shotTimer = 0
       }
-      if(this.health <= this.maxHealth * 0.30) {
+      if(this.health <= this.maxHealth * 0.35) {
         this.phase = 4
         this.shotInterval = 1500
       }
@@ -547,8 +547,7 @@ class Boss extends Enemy {
       }
       if(this.health <= this.maxHealth * 0.15) {
         this.phase = 5
-        this.shotInterval = 2500
-
+        this.shotInterval = 2200
         this.shotspeed = -0.2
       }
     }
@@ -575,7 +574,7 @@ class Boss extends Enemy {
 
     if(this.phase != 1 && this.phase != 5) {
       let angle_to_player = (this.game.player.y - this.y) / 2000 //dont ask
-      this.game.enemyProjectiles.push(new ExplosiveProjectile(this.game, enemyProjectileSprite, this.x - this.projectileWidth - 0.1, this.y + this.height / 2 - this.projectileHeight/2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage,300, angle_to_player, false, true))
+      this.game.enemyProjectiles.push(new ExplosiveProjectile(this.game, enemyExplosiveProjectileSprite, this.x - this.projectileWidth - 0.1, this.y + this.height / 2 - this.projectileHeight/2, 100, 50, this.shotSpeed, this.projectileDamage,300, angle_to_player, false, true))
     }
   }
 
@@ -981,8 +980,8 @@ class Powerup {
       this.x += this.speed * deltaTime
       if (this.x + this.width < 0 || this.x - this.width > 1700 ) this.markedForDeletion = true
     }
-    if(this.game.currentInputs.includes("r") && this.pickedUp == true && this.activated != true && this.slot == 2) this.startEffect()
-    else if(this.game.currentInputs.includes("e") && this.pickedUp == true && this.activated != true && this.slot == 1) this.startEffect()
+    if(this.game.currentInputs.includes("2") && this.pickedUp == true && this.activated != true && this.slot == 2) this.startEffect()
+    else if(this.game.currentInputs.includes("1") && this.pickedUp == true && this.activated != true && this.slot == 1) this.startEffect()
     if(this.activated == true) {
       this.durationTimer += deltaTime
       if (this.durationTimer >= this.duration){
@@ -994,6 +993,7 @@ class Powerup {
 
   draw(ctx) {
     ctx.fillStyle = this.color
+    ctx.font = "100px dashhorizon"
     if(this.pickedUp == true) {
       if(this.slot == 1) ctx.drawImage(this.sprite, 75, 250, 75, 75)
       if(this.slot == 2) ctx.drawImage(this.sprite, 200, 250, 75, 75)
@@ -1256,6 +1256,7 @@ class IngameUI extends UI {
     this.fontSize = 100
     this.fontFamily = "dashhorizon"
     this.color = "white"
+    this.blinking = true
   }
   update(deltaTime) {
     super.update(deltaTime)
@@ -1277,7 +1278,14 @@ class IngameUI extends UI {
       ctx.fillRect(50 + i*5, 250, 5, 20)
     }
     */
-  
+    
+    if(this.game.bossInterval - this.game.bossTimer <= 5000) {
+      if(this.visible){
+        ctx.fillStyle = "red"
+        ctx.font = "200px " + this.fontFamily
+        ctx.fillText("Boss Incoming", 350, 1150)
+      }
+    }
   }
 }
 
@@ -1364,7 +1372,7 @@ class Game {
     this.spawnAcceleration = 1
     this.spawnAccelerationTimer = 0
     this.spawnAccelerationInterval = 15000 // in ms
-    this.bossTimer = 60000
+    this.bossTimer = 50000
     this.bossInterval = 60000 // in ms
     this.enemies = []
     this.enemyProjectiles = []
@@ -1372,7 +1380,7 @@ class Game {
     this.collectedPowerups = []
     this.player.unlimitedAmmo = true
     this.spawnEnemies = true
-    this.gameState = "levelup"
+    this.gameState = "mainmenu"
 
   }
   update(deltaTime) {
@@ -1447,7 +1455,7 @@ class Game {
         this.enemies.push(new Boss(this))
         this.bossTimer = 0
       }
-      this.bossTimer += deltaTime
+      if(this.spawnEnemies)this.bossTimer += deltaTime
       //enemies
       this.enemySpawnTimer += deltaTime * this.spawnAcceleration
       if (this.enemySpawnTimer >= this.enemySpawnInterval && this.spawnEnemies) {

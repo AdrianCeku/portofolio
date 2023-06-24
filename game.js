@@ -185,6 +185,9 @@ explosion4Sprite.src = "assets/game/exp4.png"
 const exclamationPointSprite = new Image()
 exclamationPointSprite.src = "assets/game/exclamation_point.png"
 
+const UISprite = new Image()
+UISprite.src = "assets/game/ui.png"
+
 
 window.addEventListener("load", function () {
 class InputHandler {
@@ -233,7 +236,7 @@ class Player {
     this.damage = 25
     this.maxHealth = 200
     this.health = 200
-    this.invincible = true
+    this.invincible = false
     this.bouncingBullets = false
     this.explosiveBullets = false
     this.timeSinceLastHit = 0
@@ -437,13 +440,15 @@ class Speeder extends Enemy {
     this.dropchance = 0.5
     this.score = 45
     this.timer = 0
-    this.timerInterval = 1500
+    this.timerInterval = 500
     this.sprite = enemySpeederSprite
   }
+
   update(deltaTime) {
     if(this.timer <= this.timerInterval)  this.timer += deltaTime
     else super.update(deltaTime)
   }
+
   draw(ctx) {
     super.draw(ctx)
     if(this.timer < this.timerInterval) {
@@ -480,7 +485,7 @@ class Boss extends Enemy {
     this.sprite = enemyBossSprite
     this.boss = true
     this.phase = 0
-    this.shotInterval = 1000
+    this.shotInterval = 5000
     this.speedMultiplier = 0.5
     this.y = canvas.height / 2 - this.height / 2
     this.health = this.maxHealth * 0.7
@@ -1192,8 +1197,9 @@ class IngameUI extends UI {
   }
   draw(ctx) {
     super.draw(ctx)
-    ctx.fillText("Health: " + Math.ceil(this.game.player.health), 50, 100)
-    ctx.fillText("Ammo: " + game.player.currentAmmo, 50, 200)
+    ctx.drawImage(UISprite,35,10, 70*10,35*10)
+    ctx.fillText("Health: " + Math.ceil(this.game.player.health), 50, 120)
+    ctx.fillText("Ammo: " + game.player.currentAmmo, 50, 220)
     ctx.fillText("Time: " + Math.round(this.game.gameTime/1000) + "s", 1150, 100)
     ctx.fillText("Score: " + this.game.score, 1150, 200)
     /*for(let i = 0; i < this.game.player.currentAmmo; i++) {

@@ -215,4 +215,5 @@ export {playerSprite,
         explosion3Sprite,
         explosion4Sprite,
         exclamationPointSprite,
-        UISprite}
+        UISprite
+    }

@@ -18,7 +18,7 @@ ctx.imageSmoothingEnabled = false;
 canvas.width = 1700
 canvas.height = 1300
 
-export const dashhorizon = new FontFace("dashhorizon", "url(assets/fonts/dashhorizon.otf)")
+const dashhorizon = new FontFace("dashhorizon", "url(assets/fonts/dashhorizon.otf)")
 document.fonts.add(dashhorizon)
 
 export function randomInt(min, max) {

@@ -32,9 +32,6 @@ export function chance(percent) {
   else return false
 }
 
-export function startNewGame(){
-  game = new Game(canvas.width, canvas.height)
-}
 
 
 
@@ -313,9 +310,13 @@ class Game {
       return new ExplosivePowerup(game, x, y, width, height)
     }
   }
+
+  startNewGame(){
+    game = new Game(canvas.width, canvas.height)
+  }
 }
 
-var game = new Game(canvas.width, canvas.height)
+let game = new Game(canvas.width, canvas.height)
 
 let lastTime = 0
 function animate(timeStamp) {

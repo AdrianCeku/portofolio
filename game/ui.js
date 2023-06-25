@@ -1,5 +1,3 @@
-import { startNewGame } from "./game.js"
-
 export class UI {
     constructor(game) {
         this.game = game
@@ -98,7 +96,7 @@ export class GameOverUI extends UI {
     update(deltaTime) {
         super.update(deltaTime)
         if(this.game.currentInputs.includes("enter")) {
-            startNewGame()
+            this.game.startNewGame()
     }
     }
     draw(ctx) {

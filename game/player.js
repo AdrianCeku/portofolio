@@ -28,7 +28,7 @@ export class Player {
         this.damage = 25
         this.maxHealth = 200
         this.health = 200
-        this.invincible = false
+        this.invincible = true
         this.bouncingBullets = false
         this.explosiveBullets = false
         this.timeSinceLastHit = 0

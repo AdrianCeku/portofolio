@@ -1,6 +1,7 @@
-import { enemyShipSprite, enemyTankSprite, enemySpeederSprite, enemyBossSprite, enemyExplosiveProjectileSprite, enemyProjectileSprite, exclamationPointSprite } from "./assets"
+import { enemyShipSprite, enemyTankSprite, enemySpeederSprite, enemyBossSprite, enemyExplosiveProjectileSprite, enemyProjectileSprite, exclamationPointSprite, enemyShieldSprite } from "./assets"
 import { randomInt, canvas } from "./game"
 import { Projectile, ExplosiveProjectile, BouncingProjectile } from "./projectile"
+import { NumberParticle } from "./particle"
 
 export class Enemy {
     constructor(game, shooting, hp = randomInt(200,50), projectileDamage = 25, collisionDamage = 50) {
@@ -23,6 +24,7 @@ export class Enemy {
         this.collisionDamage = collisionDamage
         this.health = hp
         this.maxHealth = hp
+        this.invincible = false
         this.dropchance = 0.1
         this.markedForDeletion = false
         this.score = 20
@@ -61,9 +63,11 @@ export class Enemy {
     }
 
     takeDamage(damage, bullet = true) {
-        this.health -= damage
-        if(this.health <= 0) this.destory()
-        if(bullet == false)this.game.particles.push(new NumberParticle(this.game, this.x + this.width/2 - 20, this.y - 10, 75, 0, 0, "lightblue", 300, damage))
+        if(this.invincible == false) {
+            this.health -= damage
+            if(this.health <= 0) this.destory()
+            if(bullet == false)this.game.particles.push(new NumberParticle(this.game, this.x + this.width/2 - 20, this.y - 10, 75, 0, 0, "lightblue", 300, damage))
+        }
     }
 
     destory() {
@@ -87,10 +91,11 @@ export class Ship extends Enemy {
 }
 
 export class Speeder extends Enemy {
-    constructor(game,hp = 60, projectileDamage = 15, collisionDamage = 25, dropchance = 0.1) {
+    constructor(game, hp = 60, projectileDamage = 15, collisionDamage = 25, dropchance = 0.2, invincible = true) {
         super(game, null, hp, projectileDamage, collisionDamage)
         this.height = 100
         this.width = 160
+        this.invincible = invincible
         this.y = this.game.player.y
         this.speedMultiplier = (Math.random() + 0.35) * 3
         this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
@@ -99,16 +104,45 @@ export class Speeder extends Enemy {
         this.timer = 0
         this.timerInterval = 500
         this.sprite = enemySpeederSprite
+        this.shield = {
+            x : this.x - 30,
+            y : this.y - 25,
+            width : this.width/8*2,
+            height : this.height+50,
+        }
     }
 
     update(deltaTime) {
         if(this.timer <= this.timerInterval)  this.timer += deltaTime
         else super.update(deltaTime)
+        if(this.invincible) {
+            this.shield = {
+                x : this.x - 45,
+                y : this.y - 25,
+                width : this.width/8*3,
+                height : this.height+50,
+            }
+            this.game.playerProjectiles.forEach(projectile => {
+                if (this.game.checkCollision(projectile, this.shield)) {
+                    projectile.markedForDeletion = true
+                    if(projectile.explosive) projectile.onHit(null)
+                    else this.game.particles.push(new NumberParticle(this.game, this.x, this.y, 50, this.speedX * this.speedMultiplier, this.speedY * this.speedMultiplier, "yellow", 500, "shielded"))
+
+                }
+            })
+        }
     }
 
     draw(ctx) {
         super.draw(ctx)
         if(this.timer < this.timerInterval) ctx.drawImage(exclamationPointSprite, 100, this.y + this.height/2 - 60, 40, 120)
+        if(this.invincible) {
+            ctx.drawImage(enemyShieldSprite, this.x - 45, this.y - 25, this.width/8*3, this.height+50)
+            if(this.game.currentInputs.includes("f")) {
+                ctx.fillStyle = "white"
+                ctx.fillRect(this.shield.x, this.shield.y, this.shield.width, this.shield.height)
+            }
+        }
     }
 }
 
@@ -219,7 +253,7 @@ export class Boss extends Enemy {
             this.game.enemyProjectiles.push(new BouncingProjectile(this.game, enemyProjectileSprite, this.x - this.projectileWidth - 0.1, this.y + this.height / 2 - this.projectileHeight/2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage, this.shotSpeed*2))
         }
         if(this.phase >= 3 ) {
-            this.game.enemies.push(new Speeder(this.game, 50, 15, 25, 0))
+            this.game.enemies.push(new Speeder(this.game, 50, 15, 25, 0, false))
         }
     
         if(this.phase != 1 && this.phase != 5) {

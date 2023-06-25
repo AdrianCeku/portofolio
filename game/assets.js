@@ -1,55 +1,58 @@
 //assets
 
 const playerSprite = new Image()
-playerSprite.src = "game/assets/player.png"
+playerSprite.src = "game/assets/upscaled/player.png"
 
 const enemyShipSprite = new Image()
-enemyShipSprite.src = "game/assets/enemy_ship.png"
+enemyShipSprite.src = "game/assets/upscaled/enemy_ship.png"
 
 const enemyTankSprite = new Image()
-enemyTankSprite.src = "game/assets/enemy_tank.png"
+enemyTankSprite.src = "game/assets/upscaled/enemy_tank.png"
 
 const enemySpeederSprite = new Image()
-enemySpeederSprite.src = "game/assets/enemy_Speeder.png"
+enemySpeederSprite.src = "game/assets/upscaled/enemy_Speeder.png"
 
 const enemyBossSprite = new Image()
-enemyBossSprite.src = "game/assets/enemy_boss_new.png"
+enemyBossSprite.src = "game/assets/upscaled/enemy_boss_new.png"
 
 const playerProjectileSprite = new Image()
-playerProjectileSprite.src = "game/assets/player_projectile.png"
+playerProjectileSprite.src = "game/assets/upscaled/player_projectile.png"
 
 const playerExplosiveProjectileSprite = new Image()
-playerExplosiveProjectileSprite.src = "game/assets/player_explosive_projectile.png"
+playerExplosiveProjectileSprite.src = "game/assets/upscaled/player_explosive_projectile.png"
 
 const enemyProjectileSprite = new Image()
-enemyProjectileSprite.src = "game/assets/enemy_projectile.png"
+enemyProjectileSprite.src = "game/assets/upscaled/enemy_projectile.png"
 
 const enemyExplosiveProjectileSprite = new Image()
-enemyExplosiveProjectileSprite.src = "game/assets/enemy_explosive_projectile.png"
+enemyExplosiveProjectileSprite.src = "game/assets/upscaled/enemy_explosive_projectile.png"
+
+const playerShieldSprite = new Image()
+playerShieldSprite.src = "game/assets/upscaled/player_shield.png"
+
+const enemyShieldSprite = new Image()
+enemyShieldSprite.src = "game/assets/upscaled/enemy_shield.png"
 
 const powerupInvincibleSprite = new Image()
-powerupInvincibleSprite.src = "game/assets/powerup_invincible.png"
-
-const shieldSprite = new Image()
-shieldSprite.src = "game/assets/shield.png"
+powerupInvincibleSprite.src = "game/assets/upscaled/powerup_invincible.png"
 
 const powerupBulletSprite = new Image()
-powerupBulletSprite.src = "game/assets/powerup_bullets.png"
+powerupBulletSprite.src = "game/assets/upscaled/powerup_bullets.png"
 
 const powerupAmmoSprite = new Image()
-powerupAmmoSprite.src = "game/assets/powerup_ammo.png"
+powerupAmmoSprite.src = "game/assets/upscaled/powerup_ammo.png"
 
 const powerupHealthSprite = new Image()
-powerupHealthSprite.src = "game/assets/powerup_health.png"
+powerupHealthSprite.src = "game/assets/upscaled/powerup_health.png"
 
 const powerupDamageSprite = new Image()
-powerupDamageSprite.src = "game/assets/powerup_damage.png"
+powerupDamageSprite.src = "game/assets/upscaled/powerup_damage.png"
 
 const powerupSpeedSprite = new Image()
-powerupSpeedSprite.src = "game/assets/powerup_speed.png"
+powerupSpeedSprite.src = "game/assets/upscaled/powerup_speed.png"
 
 const powerupExplosiveSprite = new Image()
-powerupExplosiveSprite.src = "game/assets/powerup_explosive.png"
+powerupExplosiveSprite.src = "game/assets/upscaled/powerup_explosive.png"
 
 const alienPlanet1Sprite = new Image()
 alienPlanet1Sprite.src = "game/assets/alien_planet_1.png"
@@ -145,16 +148,16 @@ const cloudsSprite = new Image()
 cloudsSprite.src = "game/assets/bg_clouds.png"
 
 const explosion1Sprite = new Image()
-explosion1Sprite.src = "game/assets/exp1.png"
+explosion1Sprite.src = "game/assets/upscaled/exp1.png"
 
 const explosion2Sprite = new Image()
-explosion2Sprite.src = "game/assets/exp2.png"
+explosion2Sprite.src = "game/assets/upscaled/exp2.png"
 
 const explosion3Sprite = new Image()
-explosion3Sprite.src = "game/assets/exp3.png"
+explosion3Sprite.src = "game/assets/upscaled/exp3.png"
 
 const explosion4Sprite = new Image()
-explosion4Sprite.src = "game/assets/exp4.png"
+explosion4Sprite.src = "game/assets/upscaled/exp4.png"
 
 const exclamationPointSprite = new Image()
 exclamationPointSprite.src = "game/assets/exclamation_point.png"
@@ -171,8 +174,9 @@ export {playerSprite,
         playerExplosiveProjectileSprite,
         enemyProjectileSprite,
         enemyExplosiveProjectileSprite,
+        playerShieldSprite,
+        enemyShieldSprite,
         powerupInvincibleSprite,
-        shieldSprite,
         powerupBulletSprite,
         powerupAmmoSprite,
         powerupHealthSprite,

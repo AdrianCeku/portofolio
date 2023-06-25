@@ -1,4 +1,4 @@
-import {shieldSprite, powerupHealthSprite, powerupInvincibleSprite, powerupAmmoSprite, powerupDamageSprite, powerupSpeedSprite, powerupExplosiveSprite, powerupBulletSprite} from "./assets.js"
+import {playerShieldSprite, powerupHealthSprite, powerupInvincibleSprite, powerupAmmoSprite, powerupDamageSprite, powerupSpeedSprite, powerupExplosiveSprite, powerupBulletSprite} from "./assets.js"
 
 export class Powerup {
     constructor(game, x, y, width, height, color) {
@@ -89,13 +89,13 @@ export class InvincibilityPowerup extends Powerup {
             height : this.game.player.height+50
             }
             this.game.enemies.forEach(enemy => {
-            if(this.game.checkCollision(this.shield, enemy)) {
-                if (enemy.boss == false) enemy.markedForDeletion = true
-            }
+                if(this.game.checkCollision(this.shield, enemy)) {
+                    if (enemy.boss == false) enemy.markedForDeletion = true
+                }
             })
             this.game.enemyProjectiles.forEach(projectile => {
-            if(this.game.checkCollision(this.shield, projectile)) {
-                projectile.markedForDeletion = true
+                if(this.game.checkCollision(this.shield, projectile)) {
+                    projectile.markedForDeletion = true
             }
             })
         }
@@ -104,10 +104,10 @@ export class InvincibilityPowerup extends Powerup {
     draw(ctx) {
         super.draw(ctx)
         if(this.activated) {
-            ctx.drawImage(shieldSprite, this.game.player.x + this.game.player.width, this.game.player.y - 25, this.game.player.width/8*2, this.game.player.height+50)
+            ctx.drawImage(playerShieldSprite, this.game.player.x + this.game.player.width, this.game.player.y - 25, this.game.player.width/8*2, this.game.player.height+50)
             if(this.game.currentInputs.includes("f")) {
-            ctx.fillStyle = "white"
-            ctx.fillRect(this.shield.x, this.shield.y, this.shield.width, this.shield.height)
+                ctx.fillStyle = "white"
+                ctx.fillRect(this.shield.x, this.shield.y, this.shield.width, this.shield.height)
             }
         }
     }

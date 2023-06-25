@@ -62,7 +62,7 @@ class Game {
     this.spawnAcceleration = 1
     this.spawnAccelerationTimer = 0
     this.spawnAccelerationInterval = 15000 // in ms
-    this.bossTimer = 50000
+    this.bossTimer = 0
     this.bossInterval = 60000 // in ms
     this.enemies = []
     this.enemyProjectiles = []
@@ -276,9 +276,9 @@ class Game {
 
   randomEnemy(game, shooting) {
     let random = Math.random()
-    if (random < 0.2) {
+    if (random < 0.25) {
       return new Tank(game, shooting)
-    } else if (random < 0.99) {
+    } else if (random < 0.5) {
       return new Speeder(game, shooting)
     } else {
       return new Ship(game, shooting)
@@ -313,6 +313,14 @@ class Game {
 
   startNewGame(){
     game = new Game(canvas.width, canvas.height)
+  }
+
+  checkForActivePowerup(name) {
+    let returnval = false
+    this.collectedPowerups.forEach(powerup => {
+      if(powerup.activated == true && powerup.name == name ) returnval = true
+      })
+    return returnval
   }
 }
 

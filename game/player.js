@@ -1,5 +1,5 @@
 import { playerSprite, playerProjectileSprite, playerExplosiveProjectileSprite } from "./assets"
-import { canvas} from "./game"
+import { canvas } from "./game"
 import { Projectile, BouncingProjectile, ExplosiveProjectile } from "./projectile"
 import { NumberParticle } from "./particle"
 
@@ -28,7 +28,7 @@ export class Player {
         this.damage = 25
         this.maxHealth = 200
         this.health = 200
-        this.invincible = true
+        this.invincible = false
         this.bouncingBullets = false
         this.explosiveBullets = false
         this.timeSinceLastHit = 0
@@ -65,6 +65,11 @@ export class Player {
         if(this.shotTimer < this.shotInterval) this.shotTimer += deltaTime 
     
         this.timeSinceLastHit += deltaTime
+        if(this.invincible && this.timeSinceLastHit > 1000) {
+            if (this.game.checkForActivePowerup("Invincibility") == false) {
+                this.invincible = false
+            }
+        }
     }
 
     draw(ctx) {
@@ -86,6 +91,8 @@ export class Player {
                 ctx.fillRect(this.x, this.y + this.height + 10, this.width * (this.currentAmmo / this.maxAmmo), 10)
             }
         }
+
+
     }
 
     shoot() {
@@ -108,13 +115,16 @@ export class Player {
     }
 
     takeDamage(damage, bullet = true) {
+        if(bullet == false) {
+            if (this.invincible) this.game.particles.push(new NumberParticle(this.game, this.x + this.width/2 - 20, this.y - 10, 75, 0, 0, "yellow", 300, "shielded"))
+            else this.game.particles.push(new NumberParticle(this.game, this.x + this.width/2 - 20, this.y - 10, 75, 0, 0, "red", 300, damage))
+        }
         if(this.invincible == false) {
             this.health -= damage
             this.timeSinceLastHit = 0
-            if(bullet == false) {
-                this.game.particles.push(new NumberParticle(this.game, this.x + this.width/2 - 20, this.y - 10, 75, 0, 0, "red", 300, damage))
-            }
+            this.invincible = true
         }
+
         if(this.health <= 0 && this.game.gameState == "ingame") {
             this.game.gameState = "gameover"
             this.game.endTime = this.game.gameTime

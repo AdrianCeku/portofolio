@@ -34,14 +34,18 @@ export class Projectile {
     }
 
     onHit(target) {
-        target.takeDamage(this.damage)
-        this.game.particles.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, 70, 70, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, 0, target, false, 200))
-        if(this.playerProjectile){
-            if(target.invincible == false) this.game.particles.push(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "lightblue", 300, this.damage))
-            else this.game.particles.push(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "yellow", 500, "shielded"))
+        if (this.playerProjectile) this.game.particles.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, 70, 70, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, 0, target, false, 200))
+        else this.game.particles.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, 70, 70, 0, 0, 0, target, false, 200))
+        
+        if (target.invincible) {
+            console.log("shielded")
+            if(this.playerProjectile)this.game.particles.push(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "yellow", 300, "shielded"))
+            else this.game.particles.push(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, 0 , 0 , "yellow", 300, "shielded"))
         }
-        else this.game.particles.push(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "red", 300, this.damage))
+        else if(this.playerProjectile)this.game.particles.push(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "lightblue", 300, this.damage))
+        else this.game.particles.push(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, 0, 0, "red", 300, this.damage))
         this.markedForDeletion = true
+        target.takeDamage(this.damage)
     }
 }
 
@@ -82,16 +86,22 @@ export class ExplosiveProjectile extends BouncingProjectile {
     }
 
     onHit(target) {
-        if (target != null)target.takeDamage(this.damage)
         console.log("explosion")
         if(this.playerProjectile) {
             this.game.playerExplosions.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, this.explosionSize, this.explosionSize, 0, 0, this.damage, target, true, 400))
-            if(target != null)this.game.particles.unshift(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "lightblue", 300, this.damage))
+            if(target != null) {
+                if (target.invincible)this.game.particles.unshift(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "yellow", 300, "shielded"))
+                else this.game.particles.unshift(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "lightblue", 300, this.damage))
+            }
         }
         else {
             this.game.enemyExplosions.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, this.explosionSize, this.explosionSize, 0, 0, this.damage, target, false, 300))
-            if (target != null) this.game.particles.unshift(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "red", 300, this.damage))
+            if (target != null) {
+                if (target.invincible == true) this.game.particles.unshift(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, 0, 0, "yellow", 300, "shielded"))
+                else this.game.particles.unshift(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, 0, 0, "red", 300, this.damage))
+            }
         }
+        if (target != null)target.takeDamage(this.damage)
         this.markedForDeletion = true
     }
 }

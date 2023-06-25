@@ -1,4 +1,5 @@
 import {playerShieldSprite, powerupHealthSprite, powerupInvincibleSprite, powerupAmmoSprite, powerupDamageSprite, powerupSpeedSprite, powerupExplosiveSprite, powerupBulletSprite} from "./assets.js"
+import { NumberParticle } from "./particle.js"
 
 export class Powerup {
     constructor(game, x, y, width, height, color) {
@@ -91,11 +92,13 @@ export class InvincibilityPowerup extends Powerup {
             this.game.enemies.forEach(enemy => {
                 if(this.game.checkCollision(this.shield, enemy)) {
                     if (enemy.boss == false) enemy.markedForDeletion = true
+                    this.game.particles.push(new NumberParticle(this.game, this.game.player.x + this.game.player.width/2 - 20, this.game.player.y - 10, 50, 0, 0, "yellow", 500, "shielded"))
                 }
             })
             this.game.enemyProjectiles.forEach(projectile => {
                 if(this.game.checkCollision(this.shield, projectile)) {
                     projectile.markedForDeletion = true
+                    this.game.particles.push(new NumberParticle(this.game, this.game.player.x + this.game.player.width/2 - 20, this.game.player.y - 10, 50, 0, 0, "yellow", 500, "shielded"))
             }
             })
         }
@@ -223,12 +226,12 @@ export class ExplosivePowerup extends Powerup {
     startEffect() {
         super.startEffect()
         this.game.player.explosiveBullets = true
-        this.game.player.shotInterval = 250
+        this.game.player.shotInterval *= 2
     }
 
     endEffect() {
         super.endEffect()
         this.game.player.explosiveBullets = false
-        this.game.player.shotInterval = this.oldShotInterval
+        this.game.player.shotInterval *= 0.5
     }
 }

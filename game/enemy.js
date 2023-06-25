@@ -126,7 +126,7 @@ export class Speeder extends Enemy {
                 if (this.game.checkCollision(projectile, this.shield)) {
                     projectile.markedForDeletion = true
                     if(projectile.explosive) projectile.onHit(null)
-                    else this.game.particles.push(new NumberParticle(this.game, this.x, this.y, 50, this.speedX * this.speedMultiplier, this.speedY * this.speedMultiplier, "yellow", 500, "shielded"))
+                    this.game.particles.push(new NumberParticle(this.game, this.x, this.y, 50, this.speedX * this.speedMultiplier, this.speedY * this.speedMultiplier, "yellow", 500, "shielded"))
 
                 }
             })
@@ -164,6 +164,7 @@ export class Boss extends Enemy {
         super(game, false, hp, projectileDamage, collisionDamage)
         this.height = 56 * 9
         this.width = 52 * 9
+        this.invincible = false
         this.speedMultiplier = Math.random() + 0.01
         this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
         this.dropchance = 0.5
@@ -268,10 +269,12 @@ export class Boss extends Enemy {
         this.game.score += this.score
         if(this.game.player.health < 200) this.game.player.health = 200
         this.game.gameState = "levelup"
-        console.log("boss destoryed")
-        console.log(this.game.gameState)
         this.game.enemies = []
         this.game.enemyProjectiles = []
         this.game.playerProjectiles = []
+
+        this.game.collectedPowerups.forEach(powerup => {
+            if (powerup.activated) powerup.endEffect()
+        })
     }
 }

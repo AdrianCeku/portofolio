@@ -39,7 +39,7 @@ const enemySpeederSprite = new Image()
 enemySpeederSprite.src = "assets/game/enemy_Speeder.png"
 
 const enemyBossSprite = new Image()
-enemyBossSprite.src = "assets/game/enemy_boss.png"
+enemyBossSprite.src = "assets/game/enemy_boss_new.png"
 
 const playerProjectileSprite = new Image()
 playerProjectileSprite.src = "assets/game/player_projectile.png"
@@ -224,11 +224,11 @@ class Player {
     this.speedMultiplier = 1.3
     this.shotTimer = 0
     this.shotInterval = 100 // in ms
-    this.maxAmmo = 30
-    this.currentAmmo = 30
+    this.maxAmmo = 20
+    this.currentAmmo = 20
     this.unlimitedAmmo = false
     this.ammoTimer = 0
-    this.ammoInterval = 350 // in ms
+    this.ammoInterval = 400 // in ms
     this.explosiveAmmo = 5
     this.shotSpeed = 3
     this.projectileWidth = 100
@@ -310,12 +310,12 @@ class Player {
   shoot() {
     if (this.currentAmmo > 0 && this.shotTimer >= this.shotInterval) {
       if(this.unlimitedAmmo == false) this.currentAmmo -- 
-      if(this.explosiveBullets) this.game.playerProjectiles.push(new ExplosiveProjectile(this.game, playerExplosiveProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage * 3, 300, 0, true))
+      if(this.explosiveBullets) this.game.playerProjectiles.push(new ExplosiveProjectile(this.game, playerExplosiveProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, 50, this.shotSpeed * 0.5, this.damage * 3, 300, 0, true))
       else this.game.playerProjectiles.push(new Projectile(this.game, playerProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, true))
       if(this.bouncingBullets == true) {
         if(this.explosiveBullets) {
-          this.game.playerProjectiles.push(new ExplosiveProjectile(this.game, playerExplosiveProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage * 3, 300, -this.shotSpeed, 0, true))
-          this.game.playerProjectiles.push(new ExplosiveProjectile(this.game, playerExplosiveProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage * 3, 300, this.shotSpeed, 0, true))
+          this.game.playerProjectiles.push(new ExplosiveProjectile(this.game, playerExplosiveProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, 50, this.shotSpeed * 0.5, this.damage * 3, 300, -this.shotSpeed * 0.5, 0, true))
+          this.game.playerProjectiles.push(new ExplosiveProjectile(this.game, playerExplosiveProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, 50, this.shotSpeed * 0.5, this.damage * 3, 300, this.shotSpeed * 0.5, 0, true))
         }
         else {
           this.game.playerProjectiles.push(new BouncingProjectile(this.game, playerProjectileSprite, this.x + this.width, this.y + this.height / 2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.damage, this.shotSpeed, true))
@@ -326,22 +326,24 @@ class Player {
     }
   }
 
-  takeDamage(damage) {
-  if(this.invincible == false) {
-    this.health -= damage
-    this.timeSinceLastHit = 0
+  takeDamage(damage, bullet = true) {
+    if(this.invincible == false) {
+      this.health -= damage
+      this.timeSinceLastHit = 0
+      if(bullet == false)this.game.particles.push(new NumberParticle(this.game, this.x + this.width/2 - 20, this.y - 10, 75, 0, 0, "red", 300, damage))
+    }
+    if(this.health <= 0 && this.game.gameState == "ingame") {
+      this.game.gameState = "gameover"
+      this.game.endTime = this.game.gameTime
+      this.unlimitedAmmo = true
+      this.game.collectedPowerups = []
+      this.game.enemies = []
+      this.game.playerProjectiles = []
+      this.game.enemyProjectiles = []
+      this.game.powerups = []
+    }
   }
-  if(this.health <= 0 && this.game.gameState == "ingame") {
-    this.game.gameState = "gameover"
-    this.game.endTime = this.game.gameTime
-    this.unlimitedAmmo = true
-    this.game.collectedPowerups = []
-    this.game.enemies = []
-    this.game.playerProjectiles = []
-    this.game.enemyProjectiles = []
-    this.game.powerups = []
-  }
-  }
+
 }
 
 class Enemy {
@@ -402,9 +404,10 @@ class Enemy {
     }
   }
 
-  takeDamage(damage) {
+  takeDamage(damage, bullet = true) {
     this.health -= damage
     if(this.health <= 0) this.destory()
+    if(bullet == false)this.game.particles.push(new NumberParticle(this.game, this.x + this.width/2 - 20, this.y - 10, 75, 0, 0, "lightblue", 300, damage))
   }
 
   destory() {
@@ -477,8 +480,8 @@ class Tank extends Enemy {
 class Boss extends Enemy {
   constructor(game, hp=2500, projectileDamage = 50, collisionDamage = 100) {
     super(game, false, hp, projectileDamage, collisionDamage)
-    this.height = 500
-    this.width = 500
+    this.height = 56 * 9
+    this.width = 52 * 9
     this.speedMultiplier = Math.random() + 0.01
     this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
     this.dropchance = 0.5
@@ -574,7 +577,7 @@ class Boss extends Enemy {
 
     if(this.phase != 1 && this.phase != 5) {
       let angle_to_player = (this.game.player.y - this.y) / 2000 //dont ask
-      this.game.enemyProjectiles.push(new ExplosiveProjectile(this.game, enemyExplosiveProjectileSprite, this.x - this.projectileWidth - 0.1, this.y + this.height / 2 - this.projectileHeight/2, 100, 50, this.shotSpeed, this.projectileDamage,300, angle_to_player, false, true))
+      this.game.enemyProjectiles.push(new ExplosiveProjectile(this.game, enemyExplosiveProjectileSprite, this.x - this.projectileWidth - 0.1, this.y + this.height / 2 - this.projectileHeight/2, 100, 50, this.shotSpeed, this.projectileDamage,250, angle_to_player, false, true))
     }
   }
 
@@ -626,6 +629,8 @@ class Projectile {
   onHit(target) {
     target.takeDamage(this.damage)
     this.game.particles.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, 70, 70, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, 0, target, false, 200))
+    if(this.playerProjectile)this.game.particles.push(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "lightblue", 300, this.damage))
+    else this.game.particles.push(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "red", 300, this.damage))
     this.markedForDeletion = true
   }
 }
@@ -670,9 +675,14 @@ class ExplosiveProjectile extends BouncingProjectile {
   onHit(target) {
     if (target != null)target.takeDamage(this.damage)
     console.log("explosion")
-    if(this.playerProjectile) this.game.playerExplosions.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, this.explosionSize, this.explosionSize, 0, 0, this.damage, target, true, 500))
-    else this.game.enemyExplosions.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, this.explosionSize, this.explosionSize, 0, 0, this.damage, target, false, 500))
-    console.log(this.game.enemyExplosions)
+    if(this.playerProjectile) {
+      this.game.playerExplosions.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, this.explosionSize, this.explosionSize, 0, 0, this.damage, target, true, 400))
+      this.game.particles.unshift(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "lightblue", 300, this.damage))
+    }
+    else {
+      this.game.enemyExplosions.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, this.explosionSize, this.explosionSize, 0, 0, this.damage, target, false, 300))
+      if (target != null) this.game.particles.unshift(new NumberParticle(this.game, this.x + this.width, this.y + this.height/2 - 20, 50, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, "red", 300, this.damage))
+    }
     this.markedForDeletion = true
   }
 }
@@ -728,13 +738,33 @@ class Explosion extends Particle {
 
   onContact(target) {
     if (!this.targetsHit.includes(target)) {
-      target.takeDamage(this.damage)
+      target.takeDamage(this.damage, false)
       this.targetsHit.push(target)
       console.log("explosion damage")
     }
   }
 }
 
+class NumberParticle extends Particle {
+  constructor(game, x, y, size, speedX, speedY, color, lifeTime, text) {
+    super(game, x, y, null, null, speedX, speedY, color, lifeTime)
+    this.text = text
+    this.size = size
+  }
+
+  update(deltaTime) {
+    super.update(deltaTime)
+    this.y -= 0.08 * deltaTime
+    
+  }
+
+  draw(ctx) {
+    ctx.font = this.size + "px Dashhorizon"
+    ctx.fillStyle = this.color
+    ctx.fillText(this.text, this.x, this.y)
+    
+  }
+} 
 
 class Layer {
   constructor(game, sprite, speedMultiplier, width, height, sparkling = false, sparkleInterval = 500, sparkleSize = 5, sparkleColor = "white" ) {
@@ -1173,16 +1203,19 @@ class ExplosivePowerup extends Powerup {
     this.duration = 5500
     this.name = "Explosive Bullets"
     this.sprite = powerupExplosiveSprite
+    this.oldShotInterval = this.game.player.shotInterval
   }
 
   startEffect() {
     super.startEffect()
     this.game.player.explosiveBullets = true
+    this.game.player.shotInterval = 250
   }
 
   endEffect() {
     super.endEffect()
     this.game.player.explosiveBullets = false
+    this.game.player.shotInterval = this.oldShotInterval
   }
 }
 
@@ -1196,14 +1229,14 @@ class UI {
     this.color = "white"
     this.blinking = false
     this.blinkTimer = 0
-    this.blinkTimerInterval = 700
+    this.blinkInterval = 700
     this.visible = true
   }
   update(deltaTime) {
     this.fps = Math.round(1000/deltaTime)
     if (this.blinking) {
       this.blinkTimer += deltaTime
-      if (this.blinkTimer >= this.blinkTimerInterval) {
+      if (this.blinkTimer >= this.blinkInterval) {
         this.blinkTimer = 0
         if (this.visible == false) this.visible = true
         else this.visible = false
@@ -1321,29 +1354,44 @@ class LevelUpUI extends UI {
   constructor(game) {
     super(game)
     this.fontSize = 100
+    this.timer = 0
+    this.upgrades = []
+    this.leaving = false
+    this.blinking = true
+    this.blinkInterval = 250
   }
 
   update(deltaTime) {
+    super.update(deltaTime)
+    if(this.leaving) {
+      this.timer += deltaTime
+      if(this.timer >= 1500) {
+        this.leave()
+      }
+    }
     if(this.game.currentInputs.includes("1")){
-      //get upgrade 1
-      this.game.gameState = "ingame"
-      this.game.player.unlimitedAmmo = false
+      this.leaving = true
+
     }
     else if(this.game.currentInputs.includes("2")){
-      //get upgrade 2
-      this.game.gameState = "ingame"
-      this.game.player.unlimitedAmmo = false
+      this.leaving = true
+
     }
     else if(this.game.currentInputs.includes("3")){
-      //get upgrade 3
-      this.game.gameState = "ingame"
-      this.game.player.unlimitedAmmo = false
+      this.leaving = true
     }
   }
 
   draw(ctx) {
     super.draw(ctx)
-    ctx.fillText("Choose your upgrade. Press 1-3", 300, 1100)
+    if(this.visible && this.leaving)ctx.fillText("Choose your upgrade. Press 1-3", 300, 1100)
+    else if(this.leaving == false)ctx.fillText("Choose your upgrade. Press 1-3", 300, 1100)
+  }
+
+  leave() {
+    this.game.gameState = "ingame"
+    this.game.player.unlimitedAmmo = false
+    
   }
 }
 
@@ -1447,8 +1495,7 @@ class Game {
       this.ingameUI.update(deltaTime)
       this.spawnAccelerationTimer += deltaTime
       if (this.spawnAccelerationTimer >= this.spawnAccelerationInterval) {
-        this.spawnAcceleration *= 1.1
-        this.player.ammoInterval *= 0.95
+        this.spawnAcceleration *= 1.05
         this.spawnAccelerationTimer = 0
       }
       if(this.bossTimer >= this.bossInterval) {
@@ -1465,7 +1512,7 @@ class Game {
       this.enemies.forEach(enemy => {
         enemy.update(deltaTime)
         if (this.checkCollision(enemy, this.player)) {
-          this.player.takeDamage(enemy.collisionDamage)
+          this.player.takeDamage(enemy.collisionDamage, false)
           if(enemy.boss == false)enemy.markedForDeletion = true
         }
         if (enemy.markedForDeletion) {

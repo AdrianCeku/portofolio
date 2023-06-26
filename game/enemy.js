@@ -1,7 +1,7 @@
 import { enemyShipSprite, enemyTankSprite, enemySpeederSprite, enemyBossSprite, enemyExplosiveProjectileSprite, enemyProjectileSprite, exclamationPointSprite, enemyShieldSprite } from "./assets"
 import { randomInt, canvas } from "./game"
 import { Projectile, ExplosiveProjectile, BouncingProjectile } from "./projectile"
-import { NumberParticle } from "./particle"
+import { NumberParticle, Explosion } from "./particle"
 
 export class Enemy {
     constructor(game, shooting, hp = randomInt(200,50), projectileDamage = 25, collisionDamage = 50) {
@@ -71,9 +71,10 @@ export class Enemy {
     }
 
     destory() {
-        this.markedForDeletion = true
         game.score += this.score
+        this.game.particles.push(new Explosion(this.game, this.x + this.width/4, this.y + this.height/2, this.width, this.height, this.speedX * this.speedMultiplier / 10, 0, null))
         if(Math.random() <= this.dropchance) this.game.powerups.push(this.game.randomPowerup(this.game, this.x, this.y, 100, 100))
+        this.markedForDeletion = true
     }
 }
 

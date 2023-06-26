@@ -58,7 +58,7 @@ class Game {
     this.spawnAcceleration = 1
     this.spawnAccelerationTimer = 0
     this.spawnAccelerationInterval = 15000 // in ms
-    this.bossTimer = 60000
+    this.bossTimer = 0
     this.bossInterval = 60000 // in ms
     this.enemies = []
     this.enemyProjectiles = []
@@ -153,7 +153,7 @@ class Game {
           this.player.takeDamage(enemy.collisionDamage, false)
           if(enemy.boss == false) {
             enemy.markedForDeletion = true
-            this.particles.push(new Explosion(this, enemy.x, enemy.y, enemy.width, enemy.height, enemy.speedX * enemy.speedMultiplier / 10, 0, null))
+            this.particles.push(new Explosion(this, enemy.x + enemy.width/4, enemy.y + enemy.height/2, enemy.width, enemy.height, enemy.speedX * enemy.speedMultiplier / 10, 0, null))
           }
         }
         if (enemy.markedForDeletion) {

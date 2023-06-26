@@ -35,7 +35,7 @@ export class Projectile {
 
     onHit(target) {
         if (this.playerProjectile) this.game.particles.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, 70, 70, target.speedX * target.speedMultiplier, target.speedY * target.speedMultiplier, 0, target, false, 200))
-        else this.game.particles.push(new Explosion(this.game, this.x + this.width, this.y + this.height/2, 70, 70, 0, 0, 0, target, false, 200))
+        else this.game.particles.push(new Explosion(this.game, this.x - this.width, this.y + this.height/2, 70, 70, 0, 0, 0, target, false, 200))
         
         if (target.invincible) {
             console.log("shielded")

@@ -1,3 +1,5 @@
+import { playerExplosiveProjectileSprite, greyExplosiveProjectileSprite } from "./assets"
+
 export class UI {
     constructor(game) {
         this.game = game
@@ -28,6 +30,7 @@ export class UI {
             ctx.fillText("FPS: " + this.fps, 70, 1220)
             ctx.fillText("EPS: " + Math.round(this.game.spawnAcceleration/2*100)/100, 350, 1220)
             ctx.fillText("APS: " + Math.round(1000/this.game.player.ammoInterval*100)/100, 650, 1220)
+            ctx.fillRect(1650, 0, 150, 1300)
             ctx.font = this.fontSize + "px " + this.fontFamily
         }
     }
@@ -72,6 +75,15 @@ export class IngameUI extends UI {
         //ctx.drawImage(UISprite,35,10, 70*10,35*10)
         ctx.fillText("Health: " + Math.ceil(this.game.player.health), 50, 100)
         ctx.fillText("Ammo: " + this.game.player.currentAmmo, 50, 200)
+        
+        for(let i = 0; i < this.game.player.maxRocketAmmo; i++) {
+            ctx.drawImage(greyExplosiveProjectileSprite, 60 + i*55, 235, 50, 50)
+        }
+        for(let i = 0; i < this.game.player.currentRocketAmmo; i++) {
+            ctx.drawImage(playerExplosiveProjectileSprite, 60 + i*55, 235, 50, 50)
+        }
+        ctx.fillRect(60, 300, this.game.player.rocketTimer/this.game.player.rocketInterval*273, 5)
+
         ctx.fillText("Time: " + Math.round(this.game.gameTime/1000) + "s", 1150, 100)
         ctx.fillText("Score: " + this.game.score, 1150, 200)
         

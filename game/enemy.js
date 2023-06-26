@@ -63,7 +63,7 @@ export class Enemy {
     }
 
     takeDamage(damage, bullet = true) {
-        if(this.invincible == false) {
+        if(this.invincible == false && this.x < 1650) {
             this.health -= damage
             if(this.health <= 0) this.destory()
             if(bullet == false)this.game.particles.push(new NumberParticle(this.game, this.x + this.width/2 - 20, this.y - 10, 75, 0, 0, "lightblue", 300, damage))
@@ -184,7 +184,6 @@ export class Boss extends Enemy {
         this.x += this.speedX * this.speedMultiplier * deltaTime
         this.y += this.speedY * this.speedMultiplier * deltaTime
         this.shotTimer += deltaTime
-        console.log(this.phase)
         if(this.y >= canvas.height - this.height - 50 || this.y <= 100) this.speedY *= -1
         if(this.phase == 0) {
             if(this.x <= 1150) {

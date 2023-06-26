@@ -6,6 +6,7 @@ import { InputHandler } from "./inputhandler.js"
 import { Background } from "./background.js"
 import { InvincibilityPowerup, AmmoPowerup, BulletPowerup, ExplosivePowerup, SpeedPowerup, HealthPowerup, DamagePowerup  } from "./powerup.js"
 import { MainMenuUI, IngameUI, GameOverUI, LevelUpUI } from "./ui.js"
+import { Explosion } from "./particle.js"
 
 
 export const canvas = document.querySelector("#game")
@@ -31,11 +32,6 @@ export function chance(percent) {
   }
   else return false
 }
-
-
-
-
-window.addEventListener("load", function () {
 
 class Game {
   constructor(width, height) {
@@ -155,7 +151,10 @@ class Game {
         enemy.update(deltaTime)
         if (this.checkCollision(enemy, this.player)) {
           this.player.takeDamage(enemy.collisionDamage, false)
-          if(enemy.boss == false)enemy.markedForDeletion = true
+          if(enemy.boss == false) {
+            enemy.markedForDeletion = true
+            this.particles.push(new Explosion(this, enemy.x, enemy.y, enemy.width, enemy.height, enemy.speedX * enemy.speedMultiplier / 10, 0, null))
+          }
         }
         if (enemy.markedForDeletion) {
           this.enemies.splice(this.enemies.indexOf(enemy), 1)
@@ -316,27 +315,26 @@ class Game {
   }
 
   checkForActivePowerup(name) {
-    let returnval = false
+    let returnVal = false
     this.collectedPowerups.forEach(powerup => {
-      if(powerup.activated == true && powerup.name == name ) returnval = true
+      if(powerup.activated == true && powerup.name == name ) returnVal = true
       })
-    return returnval
+    return returnVal
   }
 }
 
-let game = new Game(canvas.width, canvas.height)
+let game
 
-let lastTime = 0
-function animate(timeStamp) {
-  const deltaTime = timeStamp - lastTime
-  lastTime = timeStamp
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  game.update(deltaTime)
-  game.draw(ctx)
-  requestAnimationFrame(animate)
-}
-
-animate(0)
-
-//closing brackets for "load" event listener
+window.addEventListener("load", function() {
+  game = new Game(canvas.width, canvas.height)
+  let lastTime = 0
+  function animate(timeStamp) {
+    const deltaTime = timeStamp - lastTime
+    lastTime = timeStamp
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    game.update(deltaTime)
+    game.draw(ctx)
+    requestAnimationFrame(animate)
+  }
+  animate(0)
 })

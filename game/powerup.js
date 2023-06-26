@@ -40,8 +40,8 @@ export class Powerup {
         ctx.fillStyle = this.color
         ctx.font = "100px dashhorizon"
         if(this.pickedUp == true) {
-            if(this.slot == 1) ctx.drawImage(this.sprite, 75, 250, 75, 75)
-            if(this.slot == 2) ctx.drawImage(this.sprite, 200, 250, 75, 75)
+            if(this.slot == 1) ctx.drawImage(this.sprite, 60, 320, 75, 75)
+            if(this.slot == 2) ctx.drawImage(this.sprite, 175, 320, 75, 75)
         }
         else if(this.activated == false){
             ctx.drawImage(this.sprite, this.x, this.y, this.height, this.width)

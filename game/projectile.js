@@ -17,7 +17,7 @@ export class Projectile {
 
     update(deltaTime) {
         this.x += this.speedX * deltaTime
-        if (this.x + this.width < 0 || this.x - this.width > 1700 ) this.markedForDeletion = true
+        if (this.x + this.width < 0 || this.x + this.width > 1700 ) this.markedForDeletion = true
     }
 
     draw(ctx) {

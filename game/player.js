@@ -13,7 +13,7 @@ export class Player {
         this.padding = 50
         this.speedX = 0
         this.speedY = 0
-        this.speedMultiplier = 1.3
+        this.speedMultiplier = 1.1
         this.shotTimer = 0
         this.shotInterval = 100 // in ms
         this.maxAmmo = 20

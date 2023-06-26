@@ -8,7 +8,7 @@ export class Enemy {
         this.game = game
         this.height = 190
         this.width = 120
-        this.x = 1700
+        this.x = 1750
         this.y = randomInt(canvas.height - this.height-50, 0)
         this.speedX = -1
         this.speedY = 0
@@ -100,7 +100,7 @@ export class Speeder extends Enemy {
         this.speedMultiplier = (Math.random() + 0.35) * 3
         this.shotSpeed = this.speedX * this.speedMultiplier - 0.25
         this.dropchance = dropchance
-        this.score = 45
+        this.score = 20
         this.timer = 0
         this.timerInterval = 500
         this.sprite = enemySpeederSprite
@@ -160,7 +160,7 @@ export class Tank extends Enemy {
 }
 
 export class Boss extends Enemy {
-        constructor(game, hp=2500, projectileDamage = 50, collisionDamage = 100) {
+        constructor(game, hp=5000, projectileDamage = 50, collisionDamage = 100) {
         super(game, false, hp, projectileDamage, collisionDamage)
         this.height = 56 * 9
         this.width = 52 * 9
@@ -253,7 +253,7 @@ export class Boss extends Enemy {
             this.game.enemyProjectiles.push(new BouncingProjectile(this.game, enemyProjectileSprite, this.x - this.projectileWidth - 0.1, this.y + this.height / 2 - this.projectileHeight/2, this.projectileWidth, this.projectileHeight, this.shotSpeed, this.projectileDamage, this.shotSpeed*2))
         }
         if(this.phase >= 3 ) {
-            this.game.enemies.push(new Speeder(this.game, 50, 15, 25, 0, false))
+            this.game.enemies.push(new Speeder(this.game, 50, 15, 25, 0.4, false))
         }
     
         if(this.phase != 1 && this.phase != 5) {

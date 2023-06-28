@@ -35,7 +35,7 @@ export class Player {
         this.maxRocketAmmo = 5
         this.currentRocketAmmo = 5
         this.rocketTimer = 0
-        this.rocketInterval = 35000
+        this.rocketInterval = 25000
         this.rocketShotTimer = 3000
         this.rocketShotInterval = 3000
         this.rocketDamage = 200

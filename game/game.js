@@ -58,7 +58,7 @@ class Game {
     this.spawnAcceleration = 1
     this.spawnAccelerationTimer = 0
     this.spawnAccelerationInterval = 15000 // in ms
-    this.bossTimer = 0
+    this.bossTimer = 600000
     this.bossInterval = 60000 // in ms
     this.enemies = []
     this.enemyProjectiles = []
@@ -277,7 +277,7 @@ class Game {
     let random = Math.random()
     if (random < 0.35) {
       return new Tank(game, shooting)
-    } else if (random < 0.25) {
+    } else if (random < 0.60) {
       return new Speeder(game, shooting)
     } else {
       return new Ship(game, shooting)
